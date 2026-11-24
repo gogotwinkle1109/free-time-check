@@ -105,6 +105,33 @@
   .q-free .qno{color:var(--ink-3);}
   .q-free textarea{background:var(--card);}
 
+  /* ---- 分步引导 ---- */
+  .wiz-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .wiz-right{margin-left:auto;text-align:right;}
+  .wiz-steps{font-size:12.5px;color:var(--ink-3);}
+  .wiz-bar{height:4px;width:170px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:6px;margin-left:auto;}
+  .wiz-bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .25s;}
+  .wiz-title{font-size:20px;margin:0 0 6px;line-height:1.4;}
+  .wiz-desc{margin:0 0 16px;font-size:14px;color:var(--ink-2);}
+  .wiz-free{margin-top:20px;padding-top:16px;border-top:1px dashed var(--line);}
+  .wiz-free label{display:block;font-size:13px;color:var(--ink-3);margin-bottom:6px;}
+  .wiz-free textarea{min-height:76px;}
+  .wiz-nav{display:flex;gap:10px;margin-top:18px;align-items:center;}
+  .wiz-nav .btn{min-height:46px;}
+  .cat{border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;background:var(--card);transition:border-color .15s,background .15s;}
+  .cat.rec{border-color:var(--accent);background:var(--accent-soft);}
+  .cat-head{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:15.5px;-webkit-tap-highlight-color:transparent;}
+  .cat-key{color:var(--accent);font-weight:800;}
+  .cat-badge{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:600;}
+  .cat-caret{margin-left:auto;color:var(--ink-3);font-size:13px;}
+  .cat-body{margin-top:10px;display:flex;flex-direction:column;gap:2px;}
+  .cat-body .opt{padding:10px 10px;min-height:44px;}
+  .cat-body .opt .txt{font-size:15px;}
+  .readonly-row{display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);align-items:baseline;}
+  .readonly-row:last-child{border-bottom:0;}
+  .readonly-k{flex:0 0 74px;font-size:13px;color:var(--ink-3);}
+  .readonly-v{font-size:15.5px;font-weight:600;}
+
   .text-fields{display:flex;flex-direction:column;gap:10px;}
   .tf{display:flex;gap:10px;align-items:flex-start;}
   .tf label{flex:0 0 76px;font-size:14px;color:var(--ink-2);padding-top:11px;font-weight:600;}
@@ -303,6 +330,25 @@
     <button class="btn primary grow" type="button" id="submitBtn">提交并保存这次记录</button>
     <button class="btn ghost" type="button" id="btnResetSurvey">清空重填</button>
   </div>
+</main>
+
+<!-- 分步引导 -->
+<main class="wrap" id="view-guided" hidden>
+  <div class="wiz-head">
+    <button class="back-btn" type="button" id="wizExit">← 退出</button>
+    <div class="wiz-right">
+      <div class="wiz-steps" id="wizSteps">第 1 步 / 共 5 步</div>
+      <div class="wiz-bar"><i id="wizBar" style="width:20%"></i></div>
+    </div>
+  </div>
+  <h2 class="wiz-title" id="wizTitle"></h2>
+  <p class="wiz-desc" id="wizDesc"></p>
+  <div class="card" id="wizBody"></div>
+  <div class="wiz-nav">
+    <button class="btn ghost" type="button" id="wizPrev">上一步</button>
+    <button class="btn primary grow" type="button" id="wizNext">下一步</button>
+  </div>
+  <div style="height:8px;"></div>
 </main>
 
 <!-- 结果 -->
@@ -551,6 +597,57 @@
     }
   ];
 
+  /* ================= 分步引导（向导式，不影响上面六组） ================= */
+  var GUIDED = {
+    id:"guided", icon:"🧭",
+    title:"分步引导：从状态到行动",
+    desc:"先看状态，再选方向，落到一个能立刻开始的动作，结束后回头看。",
+    typeLabel:"分步引导", guided:true, total:5,
+    cats:[
+      { key:"A", title:"恢复精力", items:[
+        "安静休息、闭目养神、睡一会儿","散步、拉伸、活动身体","洗澡、护肤、整理自己的身体状态",
+        "听音乐、远眺、接触自然","不接收信息，让大脑安静一会儿"
+      ]},
+      { key:"B", title:"享受和体验", items:[
+        "阅读喜欢的小说、漫画、故事","看电影、电视剧、动画","听音乐、欣赏艺术作品",
+        "做饭、品尝食物、探索新的餐饮","逛街、散步、参观展览","其他自己喜欢的娱乐方式"
+      ]},
+      { key:"C", title:"创造和表达", items:[
+        "同人创作、写故事","写日记、记录想法","绘画、设计、手工",
+        "整理自己的创意和灵感","尝试新的表达形式"
+      ]},
+      { key:"D", title:"学习和探索", items:[
+        "阅读文学作品，感受文学之美","了解历史、政治、社会和文化","阅读心理学、哲学等相关书籍",
+        "学习语言、写作或其他技能","探索 AI、技术和新的工具","围绕某个好奇的问题寻找答案"
+      ]},
+      { key:"E", title:"丰富现实生活", items:[
+        "探索附近没去过的地方","尝试一项新的活动或兴趣","认识新朋友、联系熟悉的人",
+        "发展生活中的爱好","尝试新的生活方式","处理自己一直想做的生活安排"
+      ]}
+    ],
+    needCat:{
+      "恢复精力":"A", "获得愉娛和放松":"B", "表达自己、创造一些东西":"C",
+      "满足好奇心、了解新事物":"D", "丰富生活体验":"E", "与人建立联系":"E"
+    },
+    steps:[
+      { title:"第一步：检查当前状态", desc:"先不决定做什么，只看此刻的自己和需要。" },
+      { title:"第二步：选择活动的大类型", desc:"不要先问哪件事最有价值，先看自己现在倾向于什么。" },
+      { title:"第三步：把抽象愿望变成具体行动", desc:"把「我想阅读」变成一个能立刻开始的动作。" },
+      { title:"第四步：结束后，检查自己的体验", desc:"做完了再回来看看：实际发生了什么，和预期有什么不同。" },
+      { title:"第五步：决定接下来怎么过", desc:"不必立刻填满下一段时间。" }
+    ],
+    reminder:[
+      "我不需要在每次自由时间开始之前，就想清楚自己的人生方向。",
+      "我可以从好奇和兴趣出发，不必事先证明一件事的价值。",
+      "我不需要把所有感兴趣的事情都做完，也不需要每天全面发展。",
+      "我可以认真投入，也可以适时结束。",
+      "我可以享受一件事情，而不要求它产生知识、能力或成果。",
+      "我可以尝试，也可以发现自己不喜欢，然后换一种体验。",
+      "我不必把自由时间全部填满。休息、睡觉、发呆也可以是自主选择。"
+    ]
+  };
+  SURVEYS.unshift(GUIDED);
+
   var TYPE_LABEL = {};
   SURVEYS.forEach(function(s){ TYPE_LABEL[s.id] = s.typeLabel || s.title; });
 
@@ -719,7 +816,7 @@
   }
 
   /* ================= 视图 ================= */
-  var ALL_VIEWS = ["loading","setup","gate","home","survey","result","records"];
+  var ALL_VIEWS = ["loading","setup","gate","home","survey","guided","result","records"];
   function hideAll(){
     ALL_VIEWS.forEach(function(v){
       var el = document.getElementById("view-" + v);
@@ -771,13 +868,17 @@
     return m;
   }
   function qCount(s){
+    if(s.guided) return 0;
     return s.questions.filter(function(q){ return !q.freeSlot; }).length;
   }
   function renderHome(){
     var m = counts();
     var html = SURVEYS.map(function(s){
       var n = m[s.id] || 0;
-      var sizeText = s.journal ? (s.sections.length + ' 个部分') : (qCount(s) + ' 个问题 + 留白');
+      var sizeText;
+      if(s.guided) sizeText = "5 步 · 层层深入 · 每步可自由书写";
+      else if(s.journal) sizeText = s.sections.length + " 个部分";
+      else sizeText = qCount(s) + " 个问题 + 留白";
       return '<button class="home-card" type="button" data-survey="' + s.id + '">' +
         '<span class="ico">' + s.icon + '</span>' +
         '<span class="body">' +
@@ -805,6 +906,7 @@
   var surveyForm = document.getElementById("surveyForm");
 
   function openSurvey(survey){
+    if(survey.guided){ startGuided(); return; }
     state.current = survey;
     document.getElementById("surveyTitle").textContent = survey.title;
     document.getElementById("surveyDesc").textContent = survey.desc;
@@ -813,6 +915,336 @@
     bindFormEvents();
     switchView("survey");
   }
+
+  /* ================= 分步引导：逻辑 ================= */
+  var WIZ_DRAFT_KEY = "ft-check:guided-draft";
+  var wiz = { step:1, data:null };
+
+  function blankGuided(){
+    return {
+      p1:{ energy:"", energyOther:"", need:"", free:"" },
+      p2:{ cat:"", sub:"", subOther:"", tryText:"", free:"" },
+      p3:{ action:"", time:"", endCond:"", free:"" },
+      p4:{ exp:"", gain:"", gainOther:"", diff:"", state:"", ended:"", endedOther:"", free:"" },
+      p5:{ next:"", plan:"", free:"" }
+    };
+  }
+  function loadWizDraft(){
+    try{ var j = JSON.parse(lsGet(WIZ_DRAFT_KEY) || "null"); return (j && j.data) ? j : null; }catch(e){ return null; }
+  }
+  function saveWizDraft(){ if(wiz.data) lsSet(WIZ_DRAFT_KEY, JSON.stringify({ step:wiz.step, data:wiz.data })); }
+  function clearWizDraft(){ lsDel(WIZ_DRAFT_KEY); }
+
+  function startGuided(){
+    var d = loadWizDraft();
+    if(d){ wiz.data = d.data; wiz.step = d.step || 1; toast("已恢复上次未写完的内容"); }
+    else { wiz.data = blankGuided(); wiz.step = 1; }
+    renderWiz();
+    switchView("guided");
+  }
+
+  function catByKey(k){
+    var out = null;
+    GUIDED.cats.forEach(function(c){ if(c.key === k) out = c; });
+    return out;
+  }
+  function optHtml(name, value, text, checked){
+    return '<label class="opt' + (checked ? " is-checked" : "") + '">' +
+      '<input type="radio" name="' + name + '" value="' + esc(value) + '"' + (checked ? " checked" : "") + '>' +
+      '<span class="dot" aria-hidden="true"></span><span class="txt">' + esc(text) + '</span></label>';
+  }
+  function wizQ(n, text){
+    return '<div class="qtitle"><span class="qno">' + n + '.</span><span>' + esc(text) + '</span></div>';
+  }
+  function freeSlotHtml(n, val){
+    return '<div class="wiz-free"><label>这一步还想记下什么？（可留空）</label>' +
+      '<textarea data-g="free' + n + '" placeholder="想到什么写什么，不写也行…">' + esc(val || "") + '</textarea></div>';
+  }
+
+  function renderWiz(){
+    var n = wiz.step;
+    document.getElementById("wizSteps").textContent = "第 " + n + " 步 / 共 5 步";
+    document.getElementById("wizBar").style.width = (n / 5 * 100) + "%";
+    document.getElementById("wizTitle").textContent = GUIDED.steps[n-1].title;
+    document.getElementById("wizDesc").textContent = GUIDED.steps[n-1].desc;
+    document.getElementById("wizBody").innerHTML = renderWizStep(n);
+    document.getElementById("wizPrev").style.visibility = (n === 1) ? "hidden" : "visible";
+    document.getElementById("wizNext").textContent = (n === 5) ? "保存这次记录" : "下一步";
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function renderWizStep(n){
+    var d = wiz.data, html = "";
+
+    if(n === 1){
+      html += '<div class="q">' + wizQ(1, "我现在的精力状态如何？") + '<div class="opts">' +
+        ["精力充足，头脑清醒","精力尚可，不太想动脑","身体疲惫，需要休息","精神疲惫，不想处理信息","兴奋、躁动，难以安静下来"]
+          .map(function(o){ return optHtml("g-energy", o, o, d.p1.energy === o); }).join("") +
+        optHtml("g-energy", "__other__", "其他：______", d.p1.energy === "__other__") +
+        '</div><div class="other-wrap"' + (d.p1.energy === "__other__" ? "" : " hidden") + ">" +
+        '<input type="text" data-g="energyOther" placeholder="写下你的状态" value="' + esc(d.p1.energyOther) + '"></div></div>';
+      html += '<div class="q">' + wizQ(2, "我现在最需要的是什么？") + '<div class="opts">' +
+        ["恢复精力","获得愉娛和放松","表达自己、创造一些东西","满足好奇心、了解新事物","丰富生活体验","与人建立联系","还不知道"]
+          .map(function(o){ return optHtml("g-need", o, o, d.p1.need === o); }).join("") + '</div></div>';
+      html += freeSlotHtml(1, d.p1.free);
+      return html;
+    }
+
+    if(n === 2){
+      var rec = GUIDED.needCat[d.p1.need] || "";
+      if(!d.p2.cat && rec) d.p2.cat = rec;   // 采用推荐类别（用户可点其他类换成）
+      if(rec){
+        html += '<div class="tips" style="margin:0 0 14px;padding:12px 14px;"><h3>根据第一步</h3><ul><li>' +
+          '你选的是「' + esc(d.p1.need) + '」，所以先帮你展开 <b>' + rec + '. ' + esc(catByKey(rec).title) +
+          '</b>——其他类型也可以点开选。自由书写在下面。</li></ul></div>';
+      }
+      GUIDED.cats.forEach(function(c){
+        var isRec = (c.key === rec);
+        var isOpen = d.p2.cat ? (d.p2.cat === c.key) : isRec;
+        html += '<div class="cat' + (isRec ? " rec" : "") + (isOpen ? " open" : "") + '" data-cat="' + c.key + '">' +
+          '<div class="cat-head" data-toggle="' + c.key + '">' +
+            '<span class="cat-key">' + c.key + '.</span><span>' + esc(c.title) + '</span>' +
+            (isRec ? '<span class="cat-badge">适合你现在</span>' : '') +
+            '<span class="cat-caret">' + (isOpen ? "▾" : "▸") + '</span>' +
+          '</div>' +
+          (isOpen ?
+            '<div class="cat-body">' +
+              c.items.map(function(it){ return optHtml("g-sub", it, it, d.p2.sub === it); }).join("") +
+              optHtml("g-sub", "__other__", "其他：______", d.p2.sub === "__other__") +
+              '<div class="other-wrap"' + (d.p2.sub === "__other__" ? "" : " hidden") + ">" +
+              '<input type="text" data-g="subOther" placeholder="写下你想尝试的" value="' + esc(d.p2.subOther) + '"></div>' +
+            '</div>' : "") +
+        '</div>';
+      });
+      html += '<div class="q" style="margin-top:16px;">' + wizQ(1, "我现在想尝试") +
+        '<input type="text" data-g="tryText" style="width:100%" placeholder="用一句话写下想尝试的事" value="' + esc(d.p2.tryText) + '"></div>';
+      html += freeSlotHtml(2, d.p2.free);
+      return html;
+    }
+
+    if(n === 3){
+      var cat = catByKey(d.p2.cat);
+      var sub = d.p2.sub === "__other__" ? (d.p2.subOther || "其他") : (d.p2.sub || "未选择");
+      html += '<div class="readonly-row"><span class="readonly-k">大类型</span><span class="readonly-v">' +
+        (cat ? esc(cat.key + ". " + cat.title) : "未选择") + '</span></div>';
+      html += '<div class="readonly-row"><span class="readonly-k">小类</span><span class="readonly-v">' + esc(sub) + '</span></div>';
+      html += '<div class="readonly-row" style="border-bottom:0;padding-top:4px;"><span style="font-size:12.5px;color:var(--ink-3);">' +
+        (cat ? "想换的话，点上一步回去改" : "请先在上一步选一个大类型") + '</span></div>';
+      html += '<div class="q" style="margin-top:14px;">' + wizQ(3, "我具体准备做什么？") +
+        '<div style="font-size:13px;color:var(--ink-3);line-height:1.7;margin-bottom:8px;">把「我想阅读」「我想创作」变成一个能立即开始的动作。例如：打开正在读的书，从上次停下的地方继续；打开文档接着写一个场景；找出一个感兴趣的问题，阅读相关内容。</div>' +
+        '<textarea data-g="action" placeholder="我的具体行动是…">' + esc(d.p3.action) + '</textarea></div>';
+      html += '<div class="q">' + wizQ(4, "我打算投入多少？") + '<div class="opts">' +
+        ["先尝试 15～20 分钟","约 30～40 分钟","约 60 分钟","完成一个自然的活动单元","暂时不设时间，完成一次状态检查后再决定"]
+          .map(function(o){ return optHtml("g-time", o, o, d.p3.time === o); }).join("") + '</div></div>';
+      html += '<div class="q">' + wizQ(5, "我希望给自己设定什么结束条件？") +
+        '<input type="text" data-g="endCond" style="width:100%" placeholder="例如：闹钟响就停 / 写完这一段就收 / 困了就睡" value="' + esc(d.p3.endCond) + '"></div>';
+      html += freeSlotHtml(3, d.p3.free);
+      return html;
+    }
+
+    if(n === 4){
+      html += '<div class="q">' + wizQ(1, "我实际体验了什么？") +
+        '<textarea data-g="exp" placeholder="实际做了什么、感觉如何…">' + esc(d.p4.exp) + '</textarea></div>';
+      html += '<div class="q">' + wizQ(2, "这段时间带给我什么？") + '<div class="opts">' +
+        ["快乐和愉娛","精神上的恢复","新的知识或认识","创造和表达的满足","好奇心获得满足","生活体验更加丰富","推进了一件自己在意的事情"]
+          .map(function(o){ return optHtml("g-gain", o, o, d.p4.gain === o); }).join("") +
+        optHtml("g-gain", "__other__", "其他：______", d.p4.gain === "__other__") +
+        '</div><div class="other-wrap"' + (d.p4.gain === "__other__" ? "" : " hidden") + ">" +
+        '<input type="text" data-g="gainOther" placeholder="写下你的答案" value="' + esc(d.p4.gainOther) + '"></div></div>';
+      html += '<div class="q">' + wizQ(3, "我的实际感受与开始之前的预期有什么不同？") +
+        '<textarea data-g="diff" placeholder="…">' + esc(d.p4.diff) + '</textarea></div>';
+      html += '<div class="q">' + wizQ(4, "我现在的精力和情绪状态如何？") +
+        '<textarea data-g="state" placeholder="…">' + esc(d.p4.state) + '</textarea></div>';
+      html += '<div class="q">' + wizQ(5, "我是否适时地结束了这件事？") + '<div class="opts">' +
+        ["是，体验不错，也保留了继续做的兴趣","是，但投入程度需要调整","否，过度投入，消耗了太多精力","否，过程中不断分心或偏离"]
+          .map(function(o){ return optHtml("g-ended", o, o, d.p4.ended === o); }).join("") +
+        optHtml("g-ended", "__other__", "其他：______", d.p4.ended === "__other__") +
+        '</div><div class="other-wrap"' + (d.p4.ended === "__other__" ? "" : " hidden") + ">" +
+        '<input type="text" data-g="endedOther" placeholder="写下你的答案" value="' + esc(d.p4.endedOther) + '"></div></div>';
+      html += freeSlotHtml(4, d.p4.free);
+      return html;
+    }
+
+    // n === 5
+    html += '<div class="q">' + wizQ(1, "此刻我更需要") + '<div class="opts">' +
+      ["继续当前活动","换一种活动","休息和恢复","完成今天的收尾，准备睡觉","暂时不做决定，给自己一点空白时间"]
+        .map(function(o){ return optHtml("g-next", o, o, d.p5.next === o); }).join("") + '</div></div>';
+    html += '<div class="q">' + wizQ(2, "下一步我想做") +
+      '<input type="text" data-g="plan" style="width:100%" placeholder="写一件接下来要做的小事" value="' + esc(d.p5.plan) + '"></div>';
+    html += freeSlotHtml(5, d.p5.free);
+    html += '<div class="wiz-free" style="border-top:1px solid var(--line);">' +
+      '<h3 class="jrn-title" style="margin-bottom:8px;">给自己的长期提醒</h3>' +
+      '<ul class="jrn-hints" style="color:var(--accent);">' +
+      GUIDED.reminder.map(function(t){ return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>';
+    return html;
+  }
+
+  function wizQs(sel){ var b = document.getElementById("wizBody"); return b ? b.querySelector(sel) : null; }
+  function wizVal(sel){ var el = wizQs(sel); return el ? el.value : ""; }
+  function wizChecked(name){ var el = wizQs('input[name="' + name + '"]:checked'); return el ? el.value : ""; }
+
+  function collectStep(n){
+    var d = wiz.data;
+    if(!d) return;
+    if(n === 1){
+      d.p1.energy = wizChecked("g-energy");
+      d.p1.energyOther = wizVal('[data-g="energyOther"]');
+      d.p1.need = wizChecked("g-need");
+      d.p1.free = wizVal('[data-g="free1"]');
+    } else if(n === 2){
+      d.p2.sub = wizChecked("g-sub");
+      d.p2.subOther = wizVal('[data-g="subOther"]');
+      d.p2.tryText = wizVal('[data-g="tryText"]');
+      d.p2.free = wizVal('[data-g="free2"]');
+      if(!d.p2.cat){
+        var openCat = document.querySelector("#wizBody .cat.open");
+        if(openCat) d.p2.cat = openCat.getAttribute("data-cat");
+      }
+    } else if(n === 3){
+      d.p3.action = wizVal('[data-g="action"]');
+      d.p3.time = wizChecked("g-time");
+      d.p3.endCond = wizVal('[data-g="endCond"]');
+      d.p3.free = wizVal('[data-g="free3"]');
+    } else if(n === 4){
+      d.p4.exp = wizVal('[data-g="exp"]');
+      d.p4.gain = wizChecked("g-gain");
+      d.p4.gainOther = wizVal('[data-g="gainOther"]');
+      d.p4.diff = wizVal('[data-g="diff"]');
+      d.p4.state = wizVal('[data-g="state"]');
+      d.p4.ended = wizChecked("g-ended");
+      d.p4.endedOther = wizVal('[data-g="endedOther"]');
+      d.p4.free = wizVal('[data-g="free4"]');
+    } else if(n === 5){
+      d.p5.next = wizChecked("g-next");
+      d.p5.plan = wizVal('[data-g="plan"]');
+      d.p5.free = wizVal('[data-g="free5"]');
+    }
+    saveWizDraft();
+  }
+
+  (function bindWiz(){
+    var body = document.getElementById("wizBody");
+    if(!body) return;
+    body.addEventListener("change", function(e){
+      if(e.target && e.target.type === "radio"){
+        var opts = body.querySelectorAll(".opt");
+        for(var i=0;i<opts.length;i++){
+          var inp = opts[i].querySelector("input");
+          opts[i].classList.toggle("is-checked", !!(inp && inp.checked));
+        }
+        var map = { "g-energy":"energyOther", "g-gain":"gainOther", "g-ended":"endedOther", "g-sub":"subOther" };
+        if(e.target.name === "g-sub"){
+          var openCat = body.querySelector(".cat.open");
+          if(openCat) wiz.data.p2.cat = openCat.getAttribute("data-cat");
+        }
+        var field = map[e.target.name];
+        if(field){
+          var inp2 = body.querySelector('[data-g="' + field + '"]');
+          if(inp2 && inp2.parentNode && inp2.parentNode.classList.contains("other-wrap")){
+            var show = e.target.value === "__other__";
+            inp2.parentNode.hidden = !show;
+            if(show) setTimeout(function(){ inp2.focus({preventScroll:true}); }, 60);
+          }
+        }
+        collectStep(wiz.step);
+      }
+    });
+    body.addEventListener("input", function(){ collectStep(wiz.step); });
+    body.addEventListener("click", function(e){
+      var head = e.target.closest("[data-toggle]");
+      if(!head) return;
+      collectStep(wiz.step);
+      var key = head.getAttribute("data-toggle");
+      var d = wiz.data;
+      var changed = (d.p2.cat !== key);
+      d.p2.cat = key;
+      var cat = catByKey(key);
+      if(changed && cat && d.p2.sub && d.p2.sub !== "__other__" && cat.items.indexOf(d.p2.sub) < 0){
+        d.p2.sub = ""; d.p2.subOther = "";
+      }
+      saveWizDraft();
+      body.innerHTML = renderWizStep(2);
+    });
+  })();
+
+  function wizNextGo(){
+    collectStep(wiz.step);
+    var n = wiz.step, d = wiz.data;
+    if(n === 1){
+      if(!d.p1.energy){ toast("先选一下现在的精力状态"); return; }
+      if(!d.p1.need){ toast("再选一下你现在最需要什么"); return; }
+      var recCat = GUIDED.needCat[d.p1.need] || "";
+      if(!d.p2.cat && recCat) d.p2.cat = recCat;
+    }
+    if(n === 2 && !d.p2.cat){ toast("先点开选一个大类型"); return; }
+    if(n < 5){
+      wiz.step = n + 1;
+      saveWizDraft();
+      renderWiz();
+    } else {
+      saveGuided();
+    }
+  }
+  function wizPrevGo(){
+    collectStep(wiz.step);
+    if(wiz.step > 1){ wiz.step--; saveWizDraft(); renderWiz(); }
+  }
+
+  function saveGuided(){
+    var d = wiz.data, A = [];
+    function add(q, a){ if(a && String(a).trim()) A.push({ q:q, a:String(a).trim() }); }
+    add("第一步 · 1. 我现在的精力状态", d.p1.energy === "__other__" ? ("其他：" + (d.p1.energyOther || "")) : d.p1.energy);
+    add("第一步 · 2. 我现在最需要的是什么", d.p1.need);
+    add("第一步 · 自由书写", d.p1.free);
+    var cat = catByKey(d.p2.cat);
+    add("第二步 · 选择的大类型", cat ? (cat.key + ". " + cat.title) : d.p2.cat);
+    add("第二步 · 选择的小类", d.p2.sub === "__other__" ? ("其他：" + (d.p2.subOther || "")) : d.p2.sub);
+    add("第二步 · 我想尝试", d.p2.tryText);
+    add("第二步 · 自由书写", d.p2.free);
+    add("第三步 · 我具体准备做什么", d.p3.action);
+    add("第三步 · 投入多少", d.p3.time);
+    add("第三步 · 结束条件", d.p3.endCond);
+    add("第三步 · 自由书写", d.p3.free);
+    add("第四步 · 1. 实际体验了什么", d.p4.exp);
+    add("第四步 · 2. 带给我什么", d.p4.gain === "__other__" ? ("其他：" + (d.p4.gainOther || "")) : d.p4.gain);
+    add("第四步 · 3. 与预期的不同", d.p4.diff);
+    add("第四步 · 4. 现在的精力和情绪", d.p4.state);
+    add("第四步 · 5. 是否适时结束", d.p4.ended === "__other__" ? ("其他：" + (d.p4.endedOther || "")) : d.p4.ended);
+    add("第四步 · 自由书写", d.p4.free);
+    add("第五步 · 此刻我更需要", d.p5.next);
+    add("第五步 · 下一步我想做", d.p5.plan);
+    add("第五步 · 自由书写", d.p5.free);
+
+    if(A.length < 3){ toast("至少把第一步填完再保存吧"); return; }
+
+    var entry = { ts:new Date().toISOString(), type:"guided", typeLabel:"分步引导", title:GUIDED.title, answers:A };
+    var btn = document.getElementById("wizNext");
+    btn.disabled = true; btn.textContent = "保存中…";
+    saveRecord(entry).then(function(){
+      clearWizDraft();
+      wiz.data = blankGuided(); wiz.step = 1;
+      document.getElementById("resultCard").innerHTML =
+        '<div class="qa-row"><span class="pill">分步引导</span><span class="rec-time" style="margin-left:8px;">' + esc(fmtLong(entry.ts)) + '</span></div>' +
+        A.map(function(a){ return '<div class="qa-row"><div class="qa-q">' + esc(a.q) + '</div><div class="qa-a">' + esc(a.a) + '</div></div>'; }).join("") +
+        '<div class="qa-row"><div class="qa-q">累计记录</div><div class="qa-a">共 ' + state.records.length + ' 条</div></div>';
+      switchView("result");
+      toast("已保存，可在记录里看到完整过程");
+      renderHome();
+    }).catch(function(err){
+      toast("保存失败：" + (err.message || "请检查网络"));
+    }).then(function(){
+      btn.disabled = false; btn.textContent = "保存这次记录";
+    });
+  }
+
+  document.getElementById("wizNext").addEventListener("click", wizNextGo);
+  document.getElementById("wizPrev").addEventListener("click", wizPrevGo);
+  document.getElementById("wizExit").addEventListener("click", function(){
+    collectStep(wiz.step);
+    renderHome();
+    switchView("home");
+    toast("进度已保存，下次进来可以继续");
+  });
 
   function renderQuestions(survey){
     return survey.questions.map(function(q, qi){
