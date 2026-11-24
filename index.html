@@ -7,11 +7,7 @@
 <meta name="robots" content="noindex, nofollow" />
 <title>自由时间 · 状态检查</title>
 
-<!-- ============================================================
-     云端配置（部署前由 Coala 填入；留空则首次打开进入配置向导）
-     url 形如 https://xxxxxxxx.supabase.co
-     key 是 Supabase 的 anon public key（本身是公开的，数据靠口令加密）
-     ============================================================ -->
+<!-- 云端配置（Supabase） -->
 <script>
   window.FT_CLOUD = {
     url: "https://emswjwumxxxtbrrotvtn.supabase.co",
@@ -41,11 +37,11 @@
     font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
     padding-bottom:calc(32px + env(safe-area-inset-bottom));
   }
-  button{font-family:inherit;}
+  button,input,textarea,select{font-family:inherit;}
 
   .topbar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top);}
   .topbar-in{max-width:820px;margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;gap:12px;}
-  .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:.3px;white-space:nowrap;}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:.3px;white-space:nowrap;cursor:pointer;}
   .brand .mark{width:22px;height:22px;border-radius:7px;flex:0 0 auto;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;}
   .tabs{margin-left:auto;display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;}
   .tab{appearance:none;border:0;background:transparent;color:var(--ink-2);font-size:14px;font-weight:600;padding:7px 14px;border-radius:999px;cursor:pointer;min-height:32px;transition:background .15s,color .15s;}
@@ -58,27 +54,33 @@
   .hero p{margin:0;color:var(--ink-2);font-size:14.5px;}
   .hero .today{display:inline-block;margin-top:10px;font-size:13px;color:var(--ink-3);}
 
-  .gate-card{max-width:460px;margin:28px auto;}
-  .gate-title{margin:0 0 8px;font-size:19px;display:flex;align-items:center;gap:8px;}
-  .gate-sub{margin:0 0 16px;color:var(--ink-2);font-size:14px;}
-  .field{margin-bottom:12px;}
-  .field label{display:block;font-size:13.5px;color:var(--ink-2);margin-bottom:5px;font-weight:600;}
-  .field input{
-    width:100%;font:inherit;font-size:16px;padding:12px 13px;border-radius:12px;
-    border:1px solid var(--line);background:var(--bg);color:var(--ink);outline:none;transition:border-color .15s;
+  /* 首页卡片 */
+  .home-list{display:flex;flex-direction:column;gap:10px;}
+  .home-card{
+    display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;
+    padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);
+    cursor:pointer;transition:transform .12s,box-shadow .15s,border-color .15s;
+    -webkit-tap-highlight-color:transparent;
   }
-  .field input:focus{border-color:var(--accent);}
-  .field .msg{font-size:12.5px;color:var(--ink-3);margin-top:5px;}
-  .gate-form{display:flex;flex-direction:column;}
-  .checkline{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);margin:2px 0 14px;cursor:pointer;}
-  .checkline input{width:18px;height:18px;accent-color:var(--accent);}
-  .gate-err{margin:10px 0 0;font-size:13.5px;color:#c0392b;min-height:20px;}
-  @media (prefers-color-scheme:dark){ .gate-err{color:#ff8a7a;} }
-  .linkbtn{appearance:none;border:0;background:transparent;color:var(--ink-3);font-size:13px;text-decoration:underline;cursor:pointer;padding:6px 0;}
+  .home-card:hover{transform:translateY(-1px);box-shadow:var(--shadow);border-color:var(--accent);}
+  .home-card .ico{font-size:22px;line-height:1.3;flex:0 0 auto;}
+  .home-card .body{flex:1 1 auto;min-width:0;}
+  .home-card h3{margin:0 0 3px;font-size:16px;letter-spacing:.2px;}
+  .home-card p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.55;}
+  .home-card .meta{margin-top:6px;font-size:12px;color:var(--ink-3);}
+  .home-card .arrow{align-self:center;color:var(--ink-3);font-size:18px;flex:0 0 auto;}
+
+  /* 问卷 */
+  .survey-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .back-btn{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink-2);border-radius:10px;padding:7px 12px;font-size:13.5px;cursor:pointer;min-height:36px;}
+  .back-btn:hover{background:var(--hover);}
+  .survey-tag{font-size:12.5px;color:var(--ink-3);}
+  .survey-title{font-size:20px;margin:0 0 6px;line-height:1.4;}
+  .survey-desc{margin:0 0 4px;font-size:14px;color:var(--ink-2);}
 
   .q{margin:0;}
   .q + .q{margin-top:22px;padding-top:22px;border-top:1px solid var(--line);}
-  .qtitle{display:flex;gap:8px;align-items:baseline;font-size:17px;font-weight:700;margin:0 0 10px;letter-spacing:.2px;}
+  .qtitle{display:flex;gap:8px;align-items:baseline;font-size:17px;font-weight:700;margin:0 0 10px;letter-spacing:.2px;line-height:1.45;}
   .qno{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:800;flex:0 0 auto;}
   .opts{display:flex;flex-direction:column;gap:2px;}
   .opt{display:flex;align-items:center;gap:13px;padding:12px 12px;border-radius:12px;border:1px solid transparent;cursor:pointer;min-height:48px;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s;}
@@ -91,9 +93,30 @@
   .opt input:checked ~ .dot::after{content:"";position:absolute;inset:3.5px;border-radius:50%;background:var(--accent);}
   .opt .txt{font-size:16px;line-height:1.45;}
 
-  textarea{width:100%;min-height:88px;resize:vertical;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 13px;outline:none;transition:border-color .15s;}
-  textarea:focus{border-color:var(--accent);}
-  .hint{font-size:12.5px;color:var(--ink-3);text-align:right;margin-top:6px;}
+  .other-wrap{margin:8px 0 0 34px;}
+  .other-wrap input{
+    width:100%;font:inherit;font-size:15.5px;padding:11px 13px;border-radius:11px;
+    border:1px solid var(--accent);background:var(--bg);color:var(--ink);outline:none;
+  }
+
+  .text-fields{display:flex;flex-direction:column;gap:10px;}
+  .tf{display:flex;gap:10px;align-items:flex-start;}
+  .tf label{flex:0 0 76px;font-size:14px;color:var(--ink-2);padding-top:11px;font-weight:600;}
+  .tf input,.tf textarea{flex:1 1 auto;width:100%;}
+  input[type="text"],textarea{
+    width:100%;font:inherit;font-size:16px;color:var(--ink);
+    background:var(--bg);border:1px solid var(--line);border-radius:12px;
+    padding:11px 13px;outline:none;transition:border-color .15s;
+  }
+  input[type="text"]:focus,textarea:focus{border-color:var(--accent);}
+  textarea{min-height:92px;resize:vertical;line-height:1.6;}
+  textarea.tall{min-height:150px;}
+
+  .jrn-section{padding:16px 0;border-top:1px solid var(--line);}
+  .jrn-section:first-of-type{border-top:0;padding-top:0;}
+  .jrn-title{font-size:16px;font-weight:700;margin:0 0 8px;}
+  .jrn-hints{margin:0 0 10px;padding-left:18px;color:var(--ink-3);font-size:13px;line-height:1.7;}
+  .jrn-hints li{margin:2px 0;}
 
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;}
   .btn{appearance:none;font-size:15px;font-weight:600;line-height:1.2;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 18px;border-radius:12px;min-height:46px;cursor:pointer;transition:transform .08s,background .15s,opacity .15s;-webkit-tap-highlight-color:transparent;}
@@ -107,34 +130,43 @@
   @media (prefers-color-scheme:dark){ .btn.danger{color:#ff8a7a;} }
   .grow{flex:1 1 auto;}
 
-  .result-line{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);}
-  .result-line:last-of-type{border-bottom:0;}
-  .result-k{color:var(--ink-3);font-size:13.5px;flex:0 0 96px;padding-top:2px;}
-  .result-v{font-size:16px;font-weight:600;}
-  .tips{margin-top:16px;padding:14px 16px;background:var(--accent-soft);border-radius:12px;}
-  .tips h3{margin:0 0 8px;font-size:14px;color:var(--accent);letter-spacing:.4px;}
-  .tips ul{margin:0;padding-left:18px;}
-  .tips li{font-size:14.5px;color:var(--ink);margin:4px 0;}
-
-  .statline{margin:0 0 14px;color:var(--ink-2);font-size:14px;line-height:1.7;}
+  /* 记录 */
+  .statline{margin:0 0 12px;color:var(--ink-2);font-size:14px;line-height:1.7;}
   .statline b{color:var(--ink);font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink-2);font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer;min-height:34px;white-space:nowrap;}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
   .btn .sh{display:none;}
+
   .rec{border:1px solid var(--line);border-radius:14px;padding:14px 15px;background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.03);}
   .rec + .rec{margin-top:10px;}
-  .rec-head{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+  .rec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
   .rec-time{font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums;}
+  .pill{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;}
   .rec-del{margin-left:auto;appearance:none;border:0;background:transparent;color:var(--ink-3);font-size:13px;cursor:pointer;padding:6px 8px;border-radius:8px;min-height:32px;}
   .rec-del:hover{background:var(--hover);color:#c0392b;}
   @media (prefers-color-scheme:dark){ .rec-del:hover{color:#ff8a7a;} }
-  .pills{display:flex;flex-wrap:wrap;gap:6px;}
-  .pill{font-size:13.5px;padding:5px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);border:1px solid transparent;white-space:nowrap;}
-  .pill.want{background:var(--accent-soft);}
-  .pill.invest{background:var(--hover);color:var(--ink-2);}
-  .pill.end{background:var(--hover);color:var(--ink-2);}
-  .rec-note{margin:10px 0 0;font-size:14.5px;color:var(--ink-2);white-space:pre-wrap;word-break:break-word;}
+  .qa-row{padding:9px 0;border-top:1px dashed var(--line);}
+  .qa-row:first-child{border-top:0;padding-top:2px;}
+  .qa-q{font-size:12.5px;color:var(--ink-3);margin-bottom:2px;line-height:1.5;}
+  .qa-a{font-size:15px;font-weight:600;white-space:pre-wrap;word-break:break-word;line-height:1.55;}
   .empty{text-align:center;padding:48px 20px;color:var(--ink-3);font-size:14.5px;border:1px dashed var(--line);border-radius:14px;}
   .empty .emoji{font-size:28px;display:block;margin-bottom:10px;opacity:.7;}
+
+  /* 口令 / 配置 */
+  .gate-card{max-width:460px;margin:28px auto;}
+  .gate-title{margin:0 0 8px;font-size:19px;display:flex;align-items:center;gap:8px;}
+  .gate-sub{margin:0 0 16px;color:var(--ink-2);font-size:14px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:13.5px;color:var(--ink-2);margin-bottom:5px;font-weight:600;}
+  .field .msg{font-size:12.5px;color:var(--ink-3);margin-top:5px;}
+  .gate-form{display:flex;flex-direction:column;}
+  .checkline{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);margin:2px 0 14px;cursor:pointer;}
+  .checkline input{width:18px;height:18px;accent-color:var(--accent);}
+  .gate-err{margin:10px 0 0;font-size:13.5px;color:#c0392b;min-height:20px;}
+  @media (prefers-color-scheme:dark){ .gate-err{color:#ff8a7a;} }
+  .linkbtn{appearance:none;border:0;background:transparent;color:var(--ink-3);font-size:13px;text-decoration:underline;cursor:pointer;padding:6px 0;}
 
   #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#1d1d1f;color:#fff;font-size:14px;padding:11px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.24);opacity:0;pointer-events:none;transition:.22s;max-width:calc(100vw - 40px);text-align:center;z-index:60;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
@@ -147,10 +179,13 @@
     .wrap{padding:16px 14px 0;}
     .card{padding:16px 15px 18px;border-radius:14px;}
     .hero h1{font-size:21px;}
+    .survey-title{font-size:18px;}
     .qtitle{font-size:16px;}
     .opt{padding:12px 8px;gap:12px;}
     .opt .txt{font-size:15.5px;}
-    .result-k{flex-basis:78px;font-size:13px;}
+    .other-wrap{margin-left:28px;}
+    .tf{flex-direction:column;gap:4px;}
+    .tf label{flex:none;padding-top:0;}
     .actions{gap:8px;}
     .actions .btn{width:100%;}
     .actions .btn.ghost{width:auto;flex:0 0 auto;margin-left:auto;font-size:14px;padding:10px 14px;min-height:40px;}
@@ -160,6 +195,7 @@
     .toolbar .btn .sh{display:inline;}
     footer{padding:0 14px;}
     .gate-card{margin:14px auto;}
+    .home-card{padding:14px;}
   }
   @media (max-width:400px){
     .topbar-in{height:52px;padding:0 12px;gap:8px;}
@@ -171,10 +207,10 @@
   }
   @media print{
     body{background:#fff;}
-    .topbar,.toolbar,#toast,.rec-del,.actions,footer{display:none !important;}
+    .topbar,.toolbar,.chips,#toast,.rec-del,.actions,footer,.back-btn{display:none !important;}
     .card,.rec{box-shadow:none;border-color:#ccc;}
     .wrap{padding:0;max-width:none;}
-    #view-check,#view-result,#view-gate,#view-loading,#view-setup{display:none !important;}
+    #view-home,#view-survey,#view-result,#view-gate,#view-loading,#view-setup{display:none !important;}
     #view-records{display:block !important;}
   }
 </style>
@@ -183,19 +219,17 @@
 
 <header class="topbar">
   <div class="topbar-in">
-    <div class="brand"><span class="mark">此</span>此刻 · 自由时间检查</div>
+    <div class="brand" id="brandHome"><span class="mark">此</span>此刻 · 状态检查</div>
     <nav class="tabs" role="tablist" aria-label="页面切换">
-      <button class="tab is-active" role="tab" data-view="check" aria-selected="true">检查</button>
+      <button class="tab is-active" role="tab" data-view="home" aria-selected="true">检查</button>
       <button class="tab" role="tab" data-view="records" aria-selected="false">记录</button>
     </nav>
   </div>
 </header>
 
-<main class="wrap" id="view-loading">
-  <div class="empty">正在打开…</div>
-</main>
+<main class="wrap" id="view-loading"><div class="empty">正在打开…</div></main>
 
-<!-- ==================== 首次配置向导 ==================== -->
+<!-- 首次配置 -->
 <main class="wrap" id="view-setup" hidden>
   <div class="card gate-card">
     <h2 class="gate-title">⚙️ 首次配置</h2>
@@ -203,11 +237,11 @@
     <form class="gate-form" id="setupForm" novalidate>
       <div class="field">
         <label for="cfgUrl">Supabase 项目 URL</label>
-        <input type="url" id="cfgUrl" placeholder="https://xxxxxxxx.supabase.co" spellcheck="false" autocapitalize="off" />
+        <input type="text" id="cfgUrl" placeholder="https://xxxxxxxx.supabase.co" spellcheck="false" autocapitalize="off" />
       </div>
       <div class="field">
-        <label for="cfgKey">anon public key</label>
-        <input type="text" id="cfgKey" placeholder="eyJhbGciOi..." spellcheck="false" autocapitalize="off" />
+        <label for="cfgKey">anon / publishable key</label>
+        <input type="text" id="cfgKey" placeholder="sb_publishable_... 或 eyJ..." spellcheck="false" autocapitalize="off" />
       </div>
       <div class="field">
         <label for="cfgPass">设定一个访问口令</label>
@@ -221,7 +255,7 @@
   </div>
 </main>
 
-<!-- ==================== 口令门 ==================== -->
+<!-- 口令 -->
 <main class="wrap" id="view-gate" hidden>
   <div class="card gate-card">
     <h2 class="gate-title">🔒 输入访问口令</h2>
@@ -238,42 +272,50 @@
   </div>
 </main>
 
-<!-- ==================== 检查 ==================== -->
-<main class="wrap" id="view-check" hidden>
+<!-- 首页 -->
+<main class="wrap" id="view-home" hidden>
   <div class="hero">
-    <h1>自由时间的三个问题</h1>
-    <p>开始之前，先用一分钟确认：我真的想要什么、给多少时间、结束时希望自己是什么状态。</p>
+    <h1>选一个方向，先看清此刻</h1>
+    <p>不需要每次都想清楚人生，只要在开始之前确认：我现在是什么状态、真正需要什么、打算怎么结束。</p>
     <span class="today" id="todayLabel"></span>
   </div>
-  <form class="card" id="quiz" novalidate>
-    <div class="q">
-      <div class="qtitle"><span class="qno">4.</span><span>想补充一句吗？（可选）</span></div>
-      <textarea id="note" maxlength="200" placeholder="比如：现在有点困，想先去楼下走一圈，回来再看书。"></textarea>
-      <div class="hint"><span id="noteCount">0</span>/200</div>
-    </div>
-    <div class="actions">
-      <button type="submit" class="btn primary grow" id="submitBtn">完成检查并保存记录</button>
-      <button type="button" class="btn ghost" id="btnReset">清空重填</button>
-    </div>
-  </form>
+  <div class="home-list" id="homeList"></div>
 </main>
 
-<!-- ==================== 结果 ==================== -->
+<!-- 问卷 -->
+<main class="wrap" id="view-survey" hidden>
+  <div class="survey-top">
+    <button class="back-btn" type="button" id="backHome">← 返回</button>
+    <span class="survey-tag" id="surveyTag"></span>
+  </div>
+  <div class="hero" style="margin-top:0;">
+    <h1 class="survey-title" id="surveyTitle"></h1>
+    <p class="survey-desc" id="surveyDesc"></p>
+  </div>
+  <form class="card" id="surveyForm" novalidate></form>
+  <div class="actions">
+    <button class="btn primary grow" type="button" id="submitBtn">提交并保存这次记录</button>
+    <button class="btn ghost" type="button" id="btnResetSurvey">清空重填</button>
+  </div>
+</main>
+
+<!-- 结果 -->
 <main class="wrap" id="view-result" hidden>
   <div class="hero">
     <h1>记下了</h1>
-    <p>这次的选择已保存，结束时可以回来看看是否达成。</p>
+    <p>这次的选择已保存到你的记录里，可以随时回来对照。</p>
   </div>
   <div class="card" id="resultCard"></div>
   <div class="actions">
-    <button class="btn primary grow" id="btnAgain">再做一次检查</button>
+    <button class="btn primary grow" id="btnBackHome">回到首页</button>
     <button class="btn ghost" id="btnToRecords">查看全部记录</button>
   </div>
 </main>
 
-<!-- ==================== 记录 ==================== -->
+<!-- 记录 -->
 <main class="wrap" id="view-records" hidden>
   <div class="statline" id="statline"></div>
+  <div class="chips" id="filterChips"></div>
   <div class="toolbar">
     <button class="btn sm" data-export="csv"><span class="lg">导出 CSV（Excel）</span><span class="sh">导出 CSV</span></button>
     <button class="btn sm" data-export="json"><span class="lg">导出 JSON</span><span class="sh">导出 JSON</span></button>
@@ -297,46 +339,210 @@
   "use strict";
 
   /* ================= 题库 ================= */
-  var QS = [
-    { id:"want", title:"我现在真正想要的是什么？", opts:[
-      "恢复精力","享受一点乐趣","主动做点有创造性的事情","了解一些新东西","还不知道"
-    ]},
-    { id:"invest", title:"我打算给这件事多少投入？", opts:[
-      "20 ~ 30 分钟","40 ~ 60 分钟","60 ~ 90 分钟","暂时不确定"
-    ]},
-    { id:"end", title:"结束时，我希望自己是什么状态？", opts:[
-      "精力得到恢复","获得了一点愉悦","推进了一小步","还保留着继续做的兴趣"
-    ]}
+  var SURVEYS = [
+    {
+      id:"free-time", icon:"🌿",
+      title:"自由时间：我现在想做什么？",
+      desc:"睡醒、工作完成、拥有一段自由时间，却不知道做什么的时候。",
+      typeLabel:"自由时间",
+      questions:[
+        { id:"q1", title:"我现在的精神和身体状态是什么？", options:[
+          "精力充足，头脑清醒","身体不累，但不太想动脑","精神疲惫，不想处理信息",
+          "有些烦躁、焦虑或心神不定","有些空虚、茫然，不知道做什么","很兴奋，想赶紧做点什么"
+        ], other:true },
+        { id:"q2", title:"我现在真正需要的是什么？", options:[
+          "恢复精力","享受一点乐趣","主动做点有创造性的事情","了解一些新东西",
+          "获得成就感或推进一件事情","丰富生活体验，接触一些新鲜事物","还不知道"
+        ]},
+        { id:"q3", title:"我有哪些事情想做？它们分别出于什么原因？", options:[
+          "真正感兴趣，主动想做","有明确的问题想解决","觉得自己应该做，不做会有负罪感",
+          "只是因为它比其他事情容易开始","不知道做什么，所以想找点事情填满时间"
+        ], other:true },
+        { id:"q4", title:"我决定接下来做什么？", text:[
+          { id:"activity", label:"活动" },
+          { id:"invest", label:"预计投入" },
+          { id:"gain", label:"希望获得" }
+        ]}
+      ]
+    },
+    {
+      id:"learning", icon:"📖",
+      title:"阅读和学习：我是否在有效地投入？",
+      desc:"阅读英文原版、文学作品、心理书籍、AI 学习等。",
+      typeLabel:"阅读学习",
+      questions:[
+        { id:"q1", title:"我本次学习的主要目的是什么？", options:[
+          "理解故事，享受阅读","感受作品的美，体验文学","增长知识，拓展认知",
+          "学习某种具体技能或方法","解决一个实际问题","满足好奇心，探索感兴趣的内容"
+        ], other:true },
+        { id:"q2", title:"我在学习过程中遇到了什么困难？", options:[
+          "内容太难，无法理解","生词、复杂句式影响理解","注意力容易分散",
+          "想弄懂每个细节，无法继续推进","不知道应该重点学习什么","觉得进展太慢，缺乏成就感",
+          "感觉疲惫，想换一种活动"
+        ], other:true },
+        { id:"q3", title:"我是否把学习范围扩大了？", options:[
+          "没有，基本围绕原定目标","查阅了一些必要的资料","不断延伸到其他知识，偏离原定目标",
+          "遇到不懂的内容就想彻底弄懂","为了追求完美，反复理解已经掌握的内容","不确定"
+        ]},
+        { id:"q4", title:"我本次学习的结束标准是什么？", options:[
+          "达到预定时间","完成一个章节或阅读单元","理解一个具体问题",
+          "掌握一个具体方法","精力不足，需要停止","没有设定结束标准"
+        ]},
+        { id:"q5", title:"结束后，我实际获得了什么？", options:[
+          "理解了一部分新知识","学会了一种方法","对某个问题产生了新的认识",
+          "获得了阅读或学习的乐趣","只是完成了一段阅读，还没有明显收获","消耗了很多精力，但收获有限"
+        ]}
+      ]
+    },
+    {
+      id:"writing", icon:"✍️",
+      title:"同人创作：我为什么投入，又为什么停不下来？",
+      desc:"针对创作过度投入、反复回味、在意读者反馈的情况。",
+      typeLabel:"同人创作",
+      questions:[
+        { id:"q1", title:"我今天创作的主要动力是什么？", options:[
+          "脑海里有故事想表达","对人物和情节产生了新的想法","想享受创作本身",
+          "想推进之前没有完成的作品","想获得读者的认可和反馈","觉得应该保持创作习惯"
+        ], other:true },
+        { id:"q2", title:"创作过程中，我处于什么状态？", options:[
+          "能够专注，享受创作","思路不断涌现，想法很多","遇到困难，不知道如何继续",
+          "担心写得不好，反复修改","想到读者评价，产生焦虑","容易分心，难以进入状态",
+          "越写越疲惫，但不愿意停下来"
+        ]},
+        { id:"q3", title:"创作完成后，我为什么还不愿意离开？", options:[
+          "还有未表达完的想法","舍不得结束愉快的创作体验","想反复欣赏自己的作品",
+          "想查看读者反馈","反复想象别人喜欢、赞赏自己的场景","害怕停止创作后重新陷入茫然",
+          "不知道接下来应该做什么"
+        ], other:true },
+        { id:"q4", title:"我是否获得了足够的休息和其他生活体验？", options:[
+          "有，创作没有影响其他安排","没有，创作占用了原本计划的休息时间","没有，创作影响了睡眠",
+          "没有，创作后精神高度兴奋，难以转换状态","不确定"
+        ]},
+        { id:"q5", title:"我希望下次怎样调整？", options:[
+          "继续保持目前的投入程度","提前确定创作时长","给每次创作设定一个小目标",
+          "减少反复刷新反馈","保留完整的休息和生活时间","在意犹未尽时主动结束"
+        ]}
+      ]
+    },
+    {
+      id:"video", icon:"📱",
+      title:"短视频和被动娱乐：我为什么陷进去了？",
+      desc:"观察「奖励自己」、逃避茫然、一项活动结束后无止境刷视频的情况。",
+      typeLabel:"短视频",
+      questions:[
+        { id:"q1", title:"我打开短视频之前是什么状态？", options:[
+          "刚完成一件事情，想奖励自己","工作或学习之后，精神疲惫","不知道接下来做什么",
+          "想逃避一件有阻力的事情","觉得其他娱乐活动启动起来太麻烦","想获得新鲜感和刺激","只是习惯性打开"
+        ]},
+        { id:"q2", title:"我当时希望通过短视频得到什么？", options:[
+          "放松大脑","获得快乐","消磨时间","转移注意力，不去想烦恼",
+          "寻找新鲜信息","填补无聊和空虚","其实没有明确目的"
+        ]},
+        { id:"q3", title:"实际观看时，我是什么状态？", options:[
+          "主动选择感兴趣的内容","不断寻找下一个更有趣的视频","明明没什么兴趣，还是继续刷",
+          "已经疲惫，但不想停下来","不知不觉进入自动刷视频的状态","想着再看一个就停止"
+        ]},
+        { id:"q4", title:"停止之后，我的感受是什么？", options:[
+          "得到放松，心情不错","获得了一些有趣的信息","感觉时间过得很快，但没有满足感",
+          "头脑更加疲惫","对自己浪费时间感到不满","还想继续看"
+        ], other:true },
+        { id:"q5", title:"下次遇到同样的情况，我可以尝试什么？", options:[
+          "先判断自己是否真的需要休息","换成有明确结束点的娱乐","提前确定观看时间",
+          "先决定接下来要做的事情，再开始娱乐","暂时离开手机，活动一下身体",
+          "不需要立刻做其他事情，先安静休息"
+        ]}
+      ]
+    },
+    {
+      id:"review", icon:"🪞",
+      title:"活动结束后：我如何评价这段时间？",
+      desc:"最通用的一组，刚读完、写完、学完或娱乐完都能用。",
+      typeLabel:"活动回顾",
+      questions:[
+        { id:"q1", title:"我实际做了什么？", text:[
+          { id:"what", label:"我做了什么", multiline:true }
+        ]},
+        { id:"q2", title:"我是否按照自己的意愿选择了这件事？", options:[
+          "是，我主动选择","部分是，最初有自己的意愿，后来逐渐偏离",
+          "不是，主要是习惯性行为","不是，为了逃避其他事情"
+        ]},
+        { id:"q3", title:"我获得了什么？", options:[
+          "愉悦和满足","精神上的恢复","知识和能力的增长","创造性的表达",
+          "对自己或世界的新认识","一段不错的生活体验","没有明显收获"
+        ]},
+        { id:"q4", title:"这段时间的精力消耗如何？", options:[
+          "精力充足，还想继续","有些疲惫，但总体愉快","已经比较疲惫，需要休息",
+          "过度投入，精力明显透支","没有参与感，只是在机械消磨时间"
+        ]},
+        { id:"q5", title:"下次做同样的事情，我希望有什么不同？", options:[
+          "保持现在的方式","降低开始的门槛","减少不必要的深入和延伸","提前设定结束条件",
+          "及时从活动中抽离","给其他兴趣和生活体验留出时间"
+        ], other:true }
+      ]
+    },
+    {
+      id:"journal", icon:"📔",
+      title:"自由书写：我的生活体验记录",
+      desc:"不必每项都写，想到什么写什么。适合在一天结束或周末回顾时使用。",
+      typeLabel:"自由书写",
+      journal:true,
+      sections:[
+        { id:"s1", title:"一、开始之前：我现在想要什么？", hints:[
+          "当我意识到自己拥有一段自由时间时，我的第一感受是什么？（开心、期待、茫然、空虚、焦虑……）",
+          "我现在的身体和精神状态如何？我有什么需求？还有哪些尚未察觉的需求？",
+          "此刻有什么事情吸引我？我有哪些想做的事情？（不必考虑是否有价值）",
+          "我为什么想做这件事？（喜欢、好奇、想体验、想表达，或者只是觉得应该做）"
+        ]},
+        { id:"s2", title:"二、进行之中：我正在怎样体验生活？", hints:[
+          "我现在在做什么？投入其中的感受如何？",
+          "我是否在享受这个过程？如果没有，是因为什么？",
+          "我现在的投入程度是否合适？是否过于急切想获得成果、因为害怕做得不够而不断增加投入、已经疲惫却舍不得停下？",
+          "如果现在可以自由调整，我希望怎么做？继续、暂停、换一种方式、降低要求、休息？"
+        ]},
+        { id:"s3", title:"三、结束之后：我从这段时间获得了什么？", hints:[
+          "我实际做了什么？这段经历带给我什么？（快乐、满足、放松、知识、能力、灵感、新的认识，或者只是一次普通但不错的体验）",
+          "我现在的状态如何？身体感受、精神状态、情绪感受。",
+          "我是否能够在适当的时候开始和结束？是否主动选择、是否在不知不觉中偏离意愿、是否过度投入影响了其他生活？",
+          "下次遇到类似情况，我希望怎么做？"
+        ]},
+        { id:"s4", title:"四、特别记录：当我又陷入茫然、逃避或过度投入时", hints:[
+          "这一部分不必每次填写，只在遇到问题时使用。",
+          "当时发生了什么？我当时真正的想法和感受是什么？",
+          "我为什么没有按照自己原本的意愿行动？",
+          "我真正需要的是什么？有没有其他方式可以满足这个需求？",
+          "如果重新经历一次，我希望自己怎样选择？"
+        ]},
+        { id:"s5", title:"五、阶段性回顾：我正在建立怎样的生活？", hints:[
+          "偶尔回顾，不必每天填写。",
+          "最近，我主动选择了哪些事情？其中哪些让我感到快乐、满足或者充实？",
+          "我发现自己对哪些事情真正感兴趣？有没有产生新的好奇心？",
+          "哪些事情只是我认为自己应该做，实际上并没有那么想做？",
+          "我在哪些情况下容易陷入被动、茫然或者失控？",
+          "我是否给自己留下了足够的休息、娱乐、创作、阅读和现实生活体验？",
+          "最近，我对自己的自由时间有什么新的认识？接下来还想为自己的生活增加什么体验？"
+        ]}
+      ],
+      reminder:[
+        "我不需要让每一段自由时间都产生实际成果。",
+        "我可以因为喜欢而做一件事，不需要为它寻找更高的价值。",
+        "我可以享受过程，也可以主动结束，不必等到精力耗尽。",
+        "我可以尝试新事物，也可以改变自己的兴趣。",
+        "我不必每天全面发展，也不必用一件事情填满所有空闲时间。",
+        "工作之外的时间不是等待被安排的剩余时间，而是属于我自己的生活。"
+      ]
+    }
   ];
-  var LABELS = { want:"想要的", invest:"投入", end:"期望状态" };
 
-  var WANT_TIP = {
-    "恢复精力":"先别安排任务。躺着、散步、晒太阳、闭眼听歌，都算正经事。",
-    "享受一点乐趣":"挑一件能立刻让你嘴角上扬的小事：喜欢的歌、一段老剧、一口好吃的。",
-    "主动做点有创造性的事情":"不求成品，只求动手：写三行、画两笔、搭一小段、修一个东西。",
-    "了解一些新东西":"选一个很具体的小话题，看一篇长文或一段访谈，结束时记住一个新知道的事。",
-    "还不知道":"从最省力的开始：此刻身体想动还是想静？先动五分钟，答案会自己浮出来。"
-  };
-  var INVEST_TIP = {
-    "20 ~ 30 分钟":"设一个 25 分钟的计时，铃响就停 —— 短一点反而更容易开始。",
-    "40 ~ 60 分钟":"一小时够做一件小事，记得中途起身喝口水。",
-    "60 ~ 90 分钟":"90 分钟是一段完整的沉浸，先把手机放到看不见的地方。",
-    "暂时不确定":"时间先不定，什么时候觉得够了就停下。"
-  };
-  var END_TIP = {
-    "精力得到恢复":"结束时先感受一下身体，是不是松了一点点。",
-    "获得了一点愉悦":"结束时记住那个让你笑出来的瞬间。",
-    "推进了一小步":"只要往前挪了一格，就算达成，别顺手加码。",
-    "还保留着继续做的兴趣":"停在还想继续的地方，下次才好接上。"
-  };
+  var TYPE_LABEL = {};
+  SURVEYS.forEach(function(s){ TYPE_LABEL[s.id] = s.typeLabel || s.title; });
 
   /* ================= 状态 ================= */
   var CFG_KEY = "ft-check:cfg";
   var PASS_KEY = "ft-check:pass";
-  var LOCAL_KEY = "free-time-check:records:v1";
+  var LOCAL_KEY = "free-time-check:records:v2";
   var BUILTIN = (window.FT_CLOUD && window.FT_CLOUD.url && window.FT_CLOUD.key) ? window.FT_CLOUD : null;
 
-  var state = { mode:"local", cfg:null, key:null, records:[], busy:false };
+  var state = { mode:"local", cfg:null, key:null, records:[], filter:"all", current:null, busy:false };
 
   function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
@@ -350,12 +556,8 @@
     }catch(e){}
     return null;
   }
-
   function localRead(){
-    try{
-      var arr = JSON.parse(lsGet(LOCAL_KEY) || "[]");
-      return Array.isArray(arr) ? arr : [];
-    }catch(e){ return []; }
+    try{ var a = JSON.parse(lsGet(LOCAL_KEY) || "[]"); return Array.isArray(a) ? a : []; }catch(e){ return []; }
   }
   function localWrite(list){ return lsSet(LOCAL_KEY, JSON.stringify(list)); }
 
@@ -370,9 +572,7 @@
     for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
     return bytes;
   }
-  function hasCrypto(){
-    return !!(window.crypto && window.crypto.subtle && window.TextEncoder);
-  }
+  function hasCrypto(){ return !!(window.crypto && window.crypto.subtle && window.TextEncoder); }
   function deriveKey(pass){
     var enc = new TextEncoder();
     return crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveKey"]).then(function(base){
@@ -394,15 +594,11 @@
       .then(function(pt){ return JSON.parse(new TextDecoder().decode(pt)); });
   }
 
-  /* ================= Supabase 接口 ================= */
+  /* ================= Supabase ================= */
   function sbFetch(cfg, path, opts){
     opts = opts || {};
     var base = String(cfg.url || "").replace(/\/+$/, "");
-    var headers = {
-      "apikey": cfg.key,
-      "Authorization": "Bearer " + cfg.key,
-      "Content-Type": "application/json"
-    };
+    var headers = { "apikey": cfg.key, "Authorization": "Bearer " + cfg.key, "Content-Type": "application/json" };
     if(opts.prefer) headers["Prefer"] = opts.prefer;
     return fetch(base + "/rest/v1/" + path, {
       method: opts.method || "GET",
@@ -414,8 +610,7 @@
         var data = null;
         try { data = text ? JSON.parse(text) : null; } catch(e) {}
         if(!res.ok){
-          var msg = (data && (data.message || data.hint)) || ("HTTP " + res.status);
-          var err = new Error(msg);
+          var err = new Error((data && (data.message || data.hint)) || ("HTTP " + res.status));
           err.status = res.status;
           throw err;
         }
@@ -423,9 +618,8 @@
       });
     });
   }
-
   function cloudList(){
-    return sbFetch(state.cfg, "ft_records?select=id,created_at,cipher&order=created_at.desc&limit=2000")
+    return sbFetch(state.cfg, "ft_records?select=id,created_at,cipher&order=created_at.desc&limit=3000")
       .then(function(rows){
         rows = rows || [];
         if(!rows.length) return { total:0, records:[] };
@@ -437,37 +631,45 @@
           }).catch(function(){ return null; });
         });
         return Promise.all(jobs).then(function(list){
-          var ok = list.filter(function(x){ return x; });
+          var ok = list.filter(function(x){ return x; }).map(normalize);
           ok.sort(function(a,b){ return String(b.ts).localeCompare(String(a.ts)); });
           return { total: rows.length, records: ok };
         });
       });
   }
-
+  // 兼容早期三问结构的旧记录
+  function normalize(r){
+    if(r && r.answers) {
+      if(!r.type) r.type = "legacy";
+      if(!r.typeLabel) r.typeLabel = TYPE_LABEL[r.type] || "记录";
+      return r;
+    }
+    var answers = [];
+    if(r.want) answers.push({ q:"1. 我现在真正想要的是什么？", a:r.want });
+    if(r.invest) answers.push({ q:"2. 我打算给这件事多少投入？", a:r.invest });
+    if(r.end) answers.push({ q:"3. 结束时，我希望自己是什么状态？", a:r.end });
+    if(r.note) answers.push({ q:"备注", a:r.note });
+    return { id:r.id, ts:r.ts, type:"legacy", typeLabel:"早期三问", answers:answers };
+  }
   function cloudAdd(entry){
-    var payload = { ts: entry.ts, want: entry.want, invest: entry.invest, end: entry.end, note: entry.note };
-    return encryptObj(state.key, payload).then(function(cipher){
+    return encryptObj(state.key, entry).then(function(cipher){
       return sbFetch(state.cfg, "ft_records", { method:"POST", body:[{ cipher: cipher }], prefer:"return=minimal" });
-    }).then(function(){
-      return cloudList();
-    }).then(function(r){
+    }).then(function(){ return cloudList(); }).then(function(r){
       state.records = r.records;
-      return r.records[0] || entry;
+      return state.records[0] || entry;
     });
   }
-
   function cloudDel(id){
     return sbFetch(state.cfg, "ft_records?id=eq." + encodeURIComponent(id), { method:"DELETE" })
       .then(function(){ return cloudList(); })
       .then(function(r){ state.records = r.records; });
   }
-
   function cloudClear(){
     return sbFetch(state.cfg, "ft_records?id=not.is.null", { method:"DELETE" })
       .then(function(){ state.records = []; });
   }
 
-  /* ================= 通用工具 ================= */
+  /* ================= 工具 ================= */
   var WD = ["周日","周一","周二","周三","周四","周五","周六"];
   function pad(n){ return String(n).length < 2 ? "0" + n : String(n); }
   function fmtLong(iso){
@@ -498,54 +700,10 @@
     toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2800);
   }
 
-  /* ================= 题目渲染 ================= */
-  var form = document.getElementById("quiz");
-  var noteEl = document.getElementById("note");
-  var noteCount = document.getElementById("noteCount");
-
-  function renderQuiz(){
-    var frag = document.createDocumentFragment();
-    QS.forEach(function(q, qi){
-      var wrap = document.createElement("div");
-      wrap.className = "q";
-      var head = document.createElement("div");
-      head.className = "qtitle";
-      head.innerHTML = '<span class="qno">' + (qi+1) + '.</span><span>' + esc(q.title) + '</span>';
-      wrap.appendChild(head);
-      var box = document.createElement("div");
-      box.className = "opts";
-      box.setAttribute("role","radiogroup");
-      box.setAttribute("aria-label", q.title);
-      q.opts.forEach(function(o){
-        var label = document.createElement("label");
-        label.className = "opt";
-        label.innerHTML =
-          '<input type="radio" name="' + q.id + '" value="' + esc(o) + '">' +
-          '<span class="dot" aria-hidden="true"></span>' +
-          '<span class="txt">' + esc(o) + '</span>';
-        box.appendChild(label);
-      });
-      wrap.appendChild(box);
-      frag.appendChild(wrap);
-    });
-    form.insertBefore(frag, form.firstChild);
-  }
-
-  function syncCheckedStyles(){
-    var all = form.querySelectorAll(".opt");
-    for(var i=0;i<all.length;i++){
-      var input = all[i].querySelector("input");
-      all[i].classList.toggle("is-checked", !!(input && input.checked));
-    }
-  }
-  form.addEventListener("change", function(e){
-    if(e.target && e.target.type === "radio") syncCheckedStyles();
-  });
-  noteEl.addEventListener("input", function(){ noteCount.textContent = noteEl.value.length; });
-
   /* ================= 视图 ================= */
+  var ALL_VIEWS = ["loading","setup","gate","home","survey","result","records"];
   function hideAll(){
-    ["loading","setup","gate","check","result","records"].forEach(function(v){
+    ALL_VIEWS.forEach(function(v){
       var el = document.getElementById("view-" + v);
       if(el) el.hidden = true;
     });
@@ -554,7 +712,7 @@
     hideAll();
     var el = document.getElementById("view-" + name);
     if(el) el.hidden = false;
-    var top = (name === "records") ? "records" : "check";
+    var top = (name === "records") ? "records" : "home";
     var tabs = document.querySelectorAll(".tab");
     for(var i=0;i<tabs.length;i++){
       var on = tabs[i].getAttribute("data-view") === top;
@@ -564,14 +722,6 @@
     try{ history.replaceState(null, "", "#" + name); }catch(err){}
     window.scrollTo({top:0, behavior:"smooth"});
   }
-  document.querySelector(".tabs").addEventListener("click", function(e){
-    var btn = e.target.closest("[data-view]");
-    if(!btn) return;
-    var v = btn.getAttribute("data-view");
-    if(v === "records") renderRecords();
-    switchView(v);
-  });
-
   function setBadge(){
     var el = document.getElementById("syncBadge");
     if(state.mode === "cloud"){
@@ -582,112 +732,252 @@
       el.className = "badge";
     }
   }
-
-  /* ================= 配置向导 ================= */
-  var setupForm = document.getElementById("setupForm");
-  var setupErr = document.getElementById("setupErr");
-  var setupBtn = document.getElementById("setupBtn");
-
-  setupForm.addEventListener("submit", function(e){
-    e.preventDefault();
-    var url = document.getElementById("cfgUrl").value.trim();
-    var key = document.getElementById("cfgKey").value.trim();
-    var pass = document.getElementById("cfgPass").value;
-    setupErr.textContent = "";
-    if(!/^https?:\/\/.+/.test(url)){ setupErr.textContent = "请填写完整的 https:// 开头地址"; return; }
-    if(key.length < 20){ setupErr.textContent = "anon key 看起来不完整"; return; }
-    if(pass.length < 4){ setupErr.textContent = "口令至少 4 位"; return; }
-
-    var cfg = { url: url, key: key };
-    setupBtn.disabled = true;
-    setupBtn.textContent = "测试连接…";
-    sbFetch(cfg, "ft_records?select=id&limit=1").then(function(){
-      return deriveKey(pass);
-    }).then(function(k){
-      state.cfg = cfg;
-      state.key = k;
-      state.mode = "cloud";
-      lsSet(CFG_KEY, JSON.stringify(cfg));
-      lsSet(PASS_KEY, btoa(encodeURIComponent(pass)));
-      return cloudList().then(function(r){
-        state.records = r.records;
-        startUI();
-        toast("配置完成，已开启云端同步");
-      });
-    }).catch(function(err){
-      if(err.status === 404 || /relation|does not exist/i.test(err.message || "")){
-        setupErr.textContent = "连不上数据表：请先在 Supabase 里运行建表 SQL（ft_records）";
-      }else if(err.status === 401 || err.status === 403){
-        setupErr.textContent = "anon key 不正确，或未开放匿名访问";
-      }else{
-        setupErr.textContent = "连接失败：" + (err.message || "请检查 URL 与网络");
-      }
-    }).then(function(){
-      setupBtn.disabled = false;
-      setupBtn.textContent = "保存并开始使用";
-    });
+  document.querySelector(".tabs").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-view]");
+    if(!btn) return;
+    var v = btn.getAttribute("data-view");
+    if(v === "records"){ renderRecords(); switchView("records"); }
+    else { renderHome(); switchView("home"); }
+  });
+  document.getElementById("brandHome").addEventListener("click", function(){
+    renderHome(); switchView("home");
+  });
+  document.getElementById("backHome").addEventListener("click", function(){
+    renderHome(); switchView("home");
   });
 
-  document.getElementById("setupSkip").addEventListener("click", function(){
-    state.mode = "local";
-    state.records = localRead();
-    startUI();
-    toast("已进入本地模式，记录不会同步");
+  /* ================= 首页 ================= */
+  function counts(){
+    var m = {};
+    state.records.forEach(function(r){ m[r.type] = (m[r.type]||0)+1; });
+    return m;
+  }
+  function renderHome(){
+    var m = counts();
+    var html = SURVEYS.map(function(s){
+      var n = m[s.id] || 0;
+      return '<button class="home-card" type="button" data-survey="' + s.id + '">' +
+        '<span class="ico">' + s.icon + '</span>' +
+        '<span class="body">' +
+          '<h3>' + esc(s.title) + '</h3>' +
+          '<p>' + esc(s.desc) + '</p>' +
+          '<span class="meta">' + (s.journal ? (s.sections.length + ' 个部分') : (s.questions.length + ' 个问题')) +
+            (n ? ' · 已记录 ' + n + ' 次' : '') + '</span>' +
+        '</span>' +
+        '<span class="arrow">›</span>' +
+      '</button>';
+    }).join("");
+    document.getElementById("homeList").innerHTML = html;
+    setBadge();
+  }
+  document.getElementById("homeList").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-survey]");
+    if(!btn) return;
+    var id = btn.getAttribute("data-survey");
+    var s = null;
+    SURVEYS.forEach(function(x){ if(x.id === id) s = x; });
+    if(s) openSurvey(s);
   });
 
-  /* ================= 口令门 ================= */
-  var gateForm = document.getElementById("gateForm");
-  var gatePass = document.getElementById("gatePass");
-  var gateErr = document.getElementById("gateErr");
-  var gateBtn = document.getElementById("gateBtn");
+  /* ================= 问卷渲染 ================= */
+  var surveyForm = document.getElementById("surveyForm");
 
-  function unlock(pass, remember){
-    gateErr.textContent = "";
-    gateBtn.disabled = true;
-    gateBtn.textContent = "验证中…";
-    return deriveKey(pass).then(function(k){
-      state.key = k;
-      return cloudList().then(function(r){
-        if(r.total > 0 && r.records.length === 0){
-          var err = new Error("口令不正确"); err.code = "AUTH"; throw err;
-        }
-        state.records = r.records;
-        if(remember) lsSet(PASS_KEY, btoa(encodeURIComponent(pass)));
-        return true;
-      });
-    }).then(function(){
-      gateBtn.disabled = false;
-      gateBtn.textContent = "进入";
-      startUI();
-    }).catch(function(err){
-      gateBtn.disabled = false;
-      gateBtn.textContent = "进入";
-      state.key = null;
-      if(err.code === "AUTH") gateErr.textContent = "口令不正确（或与云端记录的口令不一致）";
-      else gateErr.textContent = "连接失败：" + (err.message || "请检查网络");
-    });
+  function openSurvey(survey){
+    state.current = survey;
+    document.getElementById("surveyTitle").textContent = survey.title;
+    document.getElementById("surveyDesc").textContent = survey.desc;
+    document.getElementById("surveyTag").textContent = survey.journal ? "自由书写" : (survey.questions.length + " 个问题");
+    surveyForm.innerHTML = survey.journal ? renderJournal(survey) : renderQuestions(survey);
+    bindFormEvents();
+    switchView("survey");
   }
 
-  gateForm.addEventListener("submit", function(e){
-    e.preventDefault();
-    var pass = gatePass.value.trim();
-    if(!pass){ gateErr.textContent = "请输入口令"; return; }
-    unlock(pass, document.getElementById("rememberPass").checked);
+  function renderQuestions(survey){
+    return survey.questions.map(function(q, qi){
+      var head = '<div class="qtitle"><span class="qno">' + (qi+1) + '.</span><span>' + esc(q.title) + '</span></div>';
+      if(q.options){
+        var opts = q.options.map(function(o){
+          return '<label class="opt"><input type="radio" name="' + q.id + '" value="' + esc(o) + '">' +
+            '<span class="dot" aria-hidden="true"></span><span class="txt">' + esc(o) + '</span></label>';
+        }).join("");
+        if(q.other){
+          opts += '<label class="opt"><input type="radio" name="' + q.id + '" value="__other__">' +
+            '<span class="dot" aria-hidden="true"></span><span class="txt">其他：______</span></label>';
+          opts += '<div class="other-wrap" data-other="' + q.id + '" hidden>' +
+            '<input type="text" class="other-input" data-q="' + q.id + '" placeholder="写下你的答案" /></div>';
+        }
+        return '<div class="q" data-qid="' + q.id + '">' + head + '<div class="opts" role="radiogroup" aria-label="' + esc(q.title) + '">' + opts + '</div></div>';
+      }
+      if(q.text){
+        var fields = q.text.map(function(f){
+          if(f.multiline){
+            return '<div class="tf"><label>' + esc(f.label) + '</label>' +
+              '<textarea data-text="' + q.id + '-' + f.id + '" placeholder="写下来…"></textarea></div>';
+          }
+          return '<div class="tf"><label>' + esc(f.label) + '</label>' +
+            '<input type="text" data-text="' + q.id + '-' + f.id + '" placeholder="写下来…" /></div>';
+        }).join("");
+        return '<div class="q" data-qid="' + q.id + '">' + head + '<div class="text-fields">' + fields + '</div></div>';
+      }
+      return "";
+    }).join("");
+  }
+
+  function renderJournal(survey){
+    var body = survey.sections.map(function(s){
+      var hints = s.hints.map(function(h){ return "<li>" + esc(h) + "</li>"; }).join("");
+      return '<div class="jrn-section" data-sid="' + s.id + '">' +
+        '<h3 class="jrn-title">' + esc(s.title) + '</h3>' +
+        '<ul class="jrn-hints">' + hints + '</ul>' +
+        '<textarea class="tall" data-journal="' + s.id + '" placeholder="想到什么写什么，不必面面俱到…"></textarea>' +
+      '</div>';
+    }).join("");
+    var reminder = survey.reminder ? '<div class="jrn-section" style="border-top:1px solid var(--line);">' +
+      '<h3 class="jrn-title">给自己的提醒</h3>' +
+      '<ul class="jrn-hints" style="color:var(--accent);">' +
+      survey.reminder.map(function(t){ return "<li>" + esc(t) + "</li>"; }).join("") +
+      '</ul></div>' : "";
+    return body + reminder;
+  }
+
+  function bindFormEvents(){
+    surveyForm.addEventListener("change", function(e){
+      if(e.target && e.target.type === "radio"){
+        syncCheckedStyles();
+        var qid = e.target.name;
+        var wrap = surveyForm.querySelector('.other-wrap[data-other="' + qid + '"]');
+        if(wrap){
+          var isOther = e.target.value === "__other__";
+          wrap.hidden = !isOther;
+          if(isOther){
+            var inp = wrap.querySelector("input");
+            if(inp) setTimeout(function(){ inp.focus({preventScroll:true}); }, 60);
+          }
+        }
+      }
+    });
+  }
+  function syncCheckedStyles(){
+    var all = surveyForm.querySelectorAll(".opt");
+    for(var i=0;i<all.length;i++){
+      var input = all[i].querySelector("input");
+      all[i].classList.toggle("is-checked", !!(input && input.checked));
+    }
+  }
+
+  /* ================= 提交 ================= */
+  var submitBtn = document.getElementById("submitBtn");
+
+  function readQuestion(q){
+    if(q.options){
+      var picked = surveyForm.querySelector('input[name="' + q.id + '"]:checked');
+      if(!picked) return { answered:false };
+      var v = picked.value;
+      if(q.other && v === "__other__"){
+        var inp = surveyForm.querySelector('.other-input[data-q="' + q.id + '"]');
+        var extra = inp ? inp.value.trim() : "";
+        v = extra ? "其他：" + extra : "其他";
+      }
+      return { answered:true, value:v };
+    }
+    if(q.text){
+      var parts = [];
+      q.text.forEach(function(f){
+        var el = surveyForm.querySelector('[data-text="' + q.id + '-' + f.id + '"]');
+        var val = el ? el.value.trim() : "";
+        if(val) parts.push(f.label + "：" + val);
+      });
+      if(!parts.length) return { answered:false };
+      return { answered:true, value: parts.join("；") };
+    }
+    return { answered:false };
+  }
+
+  submitBtn.addEventListener("click", function(){
+    if(state.busy) return;
+    var survey = state.current;
+    if(!survey){ return; }
+    var answers = [], missing = null;
+
+    if(survey.journal){
+      survey.sections.forEach(function(s){
+        var el = surveyForm.querySelector('[data-journal="' + s.id + '"]');
+        var val = el ? el.value.trim() : "";
+        if(val) answers.push({ q:s.title, a:val });
+      });
+      if(!answers.length){ toast("至少写一段再保存吧"); return; }
+    }else{
+      for(var i=0;i<survey.questions.length;i++){
+        var q = survey.questions[i];
+        var r = readQuestion(q);
+        if(r.answered){
+          answers.push({ q:(i+1) + ". " + q.title, a:r.value });
+        }else if(q.options && !missing){
+          missing = { q:q, idx:i+1 };
+          break;
+        }
+      }
+      if(missing){
+        toast("第 " + missing.idx + " 题还没选：" + missing.q.title);
+        var el = surveyForm.querySelector('[data-qid="' + missing.q.id + '"]');
+        if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+        return;
+      }
+    }
+
+    var entry = {
+      ts: new Date().toISOString(),
+      type: survey.id,
+      typeLabel: survey.typeLabel,
+      title: survey.title,
+      answers: answers
+    };
+
+    state.busy = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "保存中…";
+    saveRecord(entry).then(function(){
+      var m = counts();
+      document.getElementById("resultCard").innerHTML =
+        '<div class="qa-row"><span class="pill">' + esc(survey.typeLabel) + '</span>' +
+        '<span class="rec-time" style="margin-left:8px;">' + esc(fmtLong(entry.ts)) + '</span></div>' +
+        answers.map(function(a){
+          return '<div class="qa-row"><div class="qa-q">' + esc(a.q) + '</div><div class="qa-a">' + esc(a.a) + '</div></div>';
+        }).join("") +
+        '<div class="qa-row"><div class="qa-q">累计记录</div><div class="qa-a">共 ' + state.records.length + ' 条</div></div>';
+      switchView("result");
+      surveyForm.innerHTML = "";
+      state.current = null;
+    }).catch(function(err){
+      toast("保存失败：" + (err.message || "请检查网络"));
+    }).then(function(){
+      state.busy = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = "提交并保存这次记录";
+    });
   });
 
-  document.getElementById("gateReset").addEventListener("click", function(){
-    if(!confirm("清除本机的 Supabase 配置？下次需要重新填写 URL 和 key（云端记录不会丢失）。")) return;
-    lsDel(CFG_KEY); lsDel(PASS_KEY);
-    state.cfg = null; state.key = null; state.mode = "local";
-    BUILTIN = null;
-    hideAll();
-    document.getElementById("view-setup").hidden = false;
+  document.getElementById("btnResetSurvey").addEventListener("click", function(){
+    var survey = state.current;
+    if(!survey) return;
+    surveyForm.innerHTML = survey.journal ? renderJournal(survey) : renderQuestions(survey);
+    bindFormEvents();
+    window.scrollTo({top:0, behavior:"smooth"});
+    toast("已清空，可以重新填写");
   });
 
-  /* ================= 数据读写 ================= */
-  function addRecord(entry){
+  document.getElementById("btnBackHome").addEventListener("click", function(){
+    renderHome(); switchView("home");
+  });
+  document.getElementById("btnToRecords").addEventListener("click", function(){
+    renderRecords(); switchView("records");
+  });
+
+  /* ================= 数据 ================= */
+  function saveRecord(entry){
     if(state.mode === "cloud") return cloudAdd(entry);
-    state.records.unshift(entry);
+    entry.id = "local-" + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    state.records.unshift(normalize(entry));
     localWrite(state.records);
     return Promise.resolve(entry);
   }
@@ -704,134 +994,67 @@
     return Promise.resolve();
   }
 
-  /* ================= 提交 ================= */
-  var submitBtn = document.getElementById("submitBtn");
-
-  function readAnswers(){
-    var data = {}, missing = null;
-    QS.forEach(function(q){
-      var picked = form.querySelector('input[name="' + q.id + '"]:checked');
-      if(picked) data[q.id] = picked.value;
-      else if(!missing) missing = q;
-    });
-    return { data:data, missing:missing };
-  }
-
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-    if(state.busy) return;
-    var r = readAnswers();
-    if(r.missing){
-      toast("还有一题没选：" + r.missing.title);
-      var first = form.querySelector('input[name="' + r.missing.id + '"]');
-      if(first){
-        var opt = first.closest(".opt");
-        if(opt) opt.scrollIntoView({behavior:"smooth", block:"center"});
-        setTimeout(function(){ first.focus({preventScroll:true}); }, 260);
-      }
-      return;
-    }
-    var entry = {
-      id: "local-" + Date.now().toString(36),
-      ts: new Date().toISOString(),
-      want: r.data.want,
-      invest: r.data.invest,
-      end: r.data.end,
-      note: (noteEl.value || "").trim()
-    };
-    state.busy = true;
-    submitBtn.disabled = true;
-    submitBtn.textContent = "保存中…";
-    addRecord(entry).then(function(saved){
-      renderRecords();
-      showResult(saved || entry);
-      form.reset();
-      syncCheckedStyles();
-      noteCount.textContent = "0";
-    }).catch(function(err){
-      toast("保存失败：" + (err.message || "请检查网络"));
-    }).then(function(){
-      state.busy = false;
-      submitBtn.disabled = false;
-      submitBtn.textContent = "完成检查并保存记录";
-    });
-  });
-
-  document.getElementById("btnReset").addEventListener("click", function(){
-    form.reset();
-    syncCheckedStyles();
-    noteCount.textContent = "0";
-    window.scrollTo({top:0, behavior:"smooth"});
-    toast("已清空，可以重新选择");
-  });
-
-  /* ================= 结果 ================= */
-  function showResult(entry){
-    var tips = [];
-    if(WANT_TIP[entry.want]) tips.push(WANT_TIP[entry.want]);
-    if(INVEST_TIP[entry.invest]) tips.push(INVEST_TIP[entry.invest]);
-    if(END_TIP[entry.end]) tips.push(END_TIP[entry.end]);
-
-    var html = "";
-    html += '<div class="result-line"><div class="result-k">时间</div><div class="result-v" style="font-weight:500;">' + esc(fmtLong(entry.ts)) + '</div></div>';
-    html += '<div class="result-line"><div class="result-k">' + LABELS.want + '</div><div class="result-v">' + esc(entry.want) + '</div></div>';
-    html += '<div class="result-line"><div class="result-k">' + LABELS.invest + '</div><div class="result-v">' + esc(entry.invest) + '</div></div>';
-    html += '<div class="result-line"><div class="result-k">' + LABELS.end + '</div><div class="result-v">' + esc(entry.end) + '</div></div>';
-    if(entry.note){
-      html += '<div class="result-line"><div class="result-k">备注</div><div class="result-v" style="font-weight:500;white-space:pre-wrap;">' + esc(entry.note) + '</div></div>';
-    }
-    html += '<div class="tips"><h3>可以这样做</h3><ul>' +
-      tips.map(function(t){ return "<li>" + esc(t) + "</li>"; }).join("") +
-      "</ul></div>";
-
-    document.getElementById("resultCard").innerHTML = html;
-    switchView("result");
-  }
-
-  document.getElementById("btnAgain").addEventListener("click", function(){
-    form.reset();
-    syncCheckedStyles();
-    noteCount.textContent = "0";
-    switchView("check");
-  });
-  document.getElementById("btnToRecords").addEventListener("click", function(){
-    switchView("records");
-  });
-
   /* ================= 记录列表 ================= */
+  function filtered(){
+    if(state.filter === "all") return state.records;
+    return state.records.filter(function(r){ return r.type === state.filter; });
+  }
   function renderRecords(){
-    var list = document.getElementById("recordList");
     var stat = document.getElementById("statline");
-    if(!list || !stat) return;
+    var chips = document.getElementById("filterChips");
+    var list = document.getElementById("recordList");
+
     if(!state.records.length){
       stat.innerHTML = "<span>还没有记录</span>";
-      list.innerHTML = '<div class="empty"><span class="emoji">🌿</span>还没有记录，回到「检查」做一次，就会出现在这里。</div>';
+      chips.innerHTML = "";
+      list.innerHTML = '<div class="empty"><span class="emoji">🌿</span>还没有记录，回到「检查」选一个方向做一次，就会出现在这里。</div>';
       return;
     }
+    var m = counts();
     stat.innerHTML = "共 <b>" + state.records.length + "</b> 条记录 · 最近一次 " + esc(fmtLong(state.records[0].ts));
-    list.innerHTML = state.records.map(function(r){
+
+    var chipHtml = '<button class="chip' + (state.filter === "all" ? " on" : "") + '" data-filter="all">全部 ' + state.records.length + '</button>';
+    SURVEYS.forEach(function(s){
+      var n = m[s.id] || 0;
+      if(!n) return;
+      chipHtml += '<button class="chip' + (state.filter === s.id ? " on" : "") + '" data-filter="' + s.id + '">' + esc(s.typeLabel) + ' ' + n + '</button>';
+    });
+    if(m["legacy"]) chipHtml += '<button class="chip' + (state.filter === "legacy" ? " on" : "") + '" data-filter="legacy">早期三问 ' + m["legacy"] + '</button>';
+    chips.innerHTML = chipHtml;
+
+    var rows = filtered();
+    if(!rows.length){
+      list.innerHTML = '<div class="empty">这个分类下还没有记录。</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function(r){
       return '<article class="rec" data-id="' + esc(r.id) + '">' +
         '<div class="rec-head">' +
+          '<span class="pill">' + esc(r.typeLabel || TYPE_LABEL[r.type] || "记录") + '</span>' +
           '<span class="rec-time">' + esc(fmtLong(r.ts)) + '</span>' +
           '<button class="rec-del" type="button" data-del="' + esc(r.id) + '" aria-label="删除这条记录">删除</button>' +
         '</div>' +
-        '<div class="pills">' +
-          '<span class="pill want">' + esc(r.want) + '</span>' +
-          '<span class="pill invest">' + esc(r.invest) + '</span>' +
-          '<span class="pill end">' + esc(r.end) + '</span>' +
-        '</div>' +
-        (r.note ? '<p class="rec-note">' + esc(r.note) + '</p>' : '') +
+        (r.answers || []).map(function(a){
+          return '<div class="qa-row"><div class="qa-q">' + esc(a.q) + '</div><div class="qa-a">' + esc(a.a) + '</div></div>';
+        }).join("") +
       '</article>';
     }).join("");
   }
 
+  document.getElementById("filterChips").addEventListener("click", function(e){
+    var chip = e.target.closest("[data-filter]");
+    if(!chip) return;
+    state.filter = chip.getAttribute("data-filter");
+    renderRecords();
+  });
+
   document.getElementById("recordList").addEventListener("click", function(e){
     var btn = e.target.closest("[data-del]");
     if(!btn) return;
-    var id = btn.getAttribute("data-del");
     if(!confirm("删除这条记录？删除后无法恢复。")) return;
-    removeRecord(id).then(function(){
+    removeRecord(btn.getAttribute("data-del")).then(function(){
       renderRecords();
+      renderHome();
       toast("已删除");
     }).catch(function(err){
       toast("删除失败：" + (err.message || "请检查网络"));
@@ -842,7 +1065,8 @@
     if(!state.records.length){ toast("暂无记录"); return; }
     if(!confirm("确定清空全部 " + state.records.length + " 条记录？此操作无法恢复。")) return;
     clearAll().then(function(){
-      renderRecords();
+      state.filter = "all";
+      renderRecords(); renderHome();
       toast("已清空全部记录");
     }).catch(function(err){
       toast("清空失败：" + (err.message || "请检查网络"));
@@ -862,37 +1086,38 @@
       return true;
     }catch(e){ return false; }
   }
+  function csvCell(v){
+    var s = String(v == null ? "" : v);
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }
   function toCSV(){
-    var head = ["序号","时间","我现在真正想要的是什么","我打算给这件事多少投入","结束时我希望自己是什么状态","备注"];
-    var rows = state.records.map(function(r, i){
-      return [i+1, fmtStamp(r.ts), r.want, r.invest, r.end, r.note || ""];
+    var lines = [["时间","类型","序号","问题","答案"].map(csvCell).join(",")];
+    filtered().slice().reverse().forEach(function(r){
+      (r.answers || []).forEach(function(a, i){
+        lines.push([fmtStamp(r.ts), r.typeLabel || r.type, i+1, a.q, a.a].map(csvCell).join(","));
+      });
     });
-    var cell = function(v){
-      var s = String(v == null ? "" : v);
-      return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
-    };
-    return "\ufeff" + [head].concat(rows).map(function(line){
-      return line.map(cell).join(",");
-    }).join("\r\n") + "\r\n";
+    return "\ufeff" + lines.join("\r\n") + "\r\n";
   }
   function toJSON(){
-    return JSON.stringify({ exportedAt: new Date().toISOString(), count: state.records.length, records: state.records }, null, 2);
+    return JSON.stringify({
+      exportedAt: new Date().toISOString(),
+      count: filtered().length,
+      records: filtered()
+    }, null, 2);
   }
   function toMarkdown(){
-    var out = [];
-    out.push("# 自由时间检查记录");
-    out.push("");
-    out.push("- 导出时间：" + fmtStamp(new Date().toISOString()));
-    out.push("- 记录条数：" + state.records.length);
-    out.push("");
-    state.records.forEach(function(r, i){
-      out.push("## " + (state.records.length - i) + ". " + fmtLong(r.ts));
+    var rows = filtered();
+    var out = ["# 自由时间与生活体验记录", "", "- 导出时间：" + fmtStamp(new Date().toISOString()), "- 记录条数：" + rows.length, ""];
+    rows.forEach(function(r, i){
+      out.push("## " + (rows.length - i) + ". " + fmtLong(r.ts) + " · " + (r.typeLabel || r.type));
       out.push("");
-      out.push("- **" + LABELS.want + "**：" + r.want);
-      out.push("- **" + LABELS.invest + "**：" + r.invest);
-      out.push("- **" + LABELS.end + "**：" + r.end);
-      if(r.note) out.push("- **备注**：" + r.note.replace(/\n/g, "\n  "));
-      out.push("");
+      (r.answers || []).forEach(function(a){
+        out.push("**" + a.q + "**");
+        out.push("");
+        out.push(a.a.replace(/\n/g, "\n  "));
+        out.push("");
+      });
     });
     return out.join("\n");
   }
@@ -901,8 +1126,7 @@
     return new Promise(function(resolve, reject){
       try{
         var ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed"; ta.style.top = "-1000px";
+        ta.value = text; ta.style.position = "fixed"; ta.style.top = "-1000px";
         document.body.appendChild(ta); ta.select();
         var ok = document.execCommand("copy");
         ta.remove();
@@ -916,32 +1140,120 @@
     var kind = btn.getAttribute("data-export");
     if(kind !== "print" && !state.records.length){ toast("还没有记录可导出"); return; }
     if(kind === "csv"){
-      download("自由时间检查记录_" + fileStamp() + ".csv", toCSV(), "text/csv") || toast("导出失败，请换用「复制全部文本」");
+      download("生活体验记录_" + fileStamp() + ".csv", toCSV(), "text/csv") || toast("导出失败，请换用「复制全部文本」");
       toast("已导出 CSV");
     }else if(kind === "json"){
-      download("自由时间检查记录_" + fileStamp() + ".json", toJSON(), "application/json") || toast("导出失败，请换用「复制全部文本」");
+      download("生活体验记录_" + fileStamp() + ".json", toJSON(), "application/json") || toast("导出失败，请换用「复制全部文本」");
       toast("已导出 JSON");
     }else if(kind === "md"){
-      download("自由时间检查记录_" + fileStamp() + ".md", toMarkdown(), "text/markdown") || toast("导出失败，请换用「复制全部文本」");
+      download("生活体验记录_" + fileStamp() + ".md", toMarkdown(), "text/markdown") || toast("导出失败，请换用「复制全部文本」");
       toast("已导出 Markdown");
     }else if(kind === "copy"){
-      copyText(toMarkdown()).then(function(){ toast("全部记录已复制到剪贴板"); })
+      copyText(toMarkdown()).then(function(){ toast("已复制到剪贴板"); })
         .catch(function(){ toast("复制失败，请改用导出文件"); });
     }else if(kind === "print"){
       window.print();
     }
   });
 
-  /* ================= 启动 ================= */
-  function startUI(){
-    setBadge();
-    renderRecords();
-    var h = (location.hash || "").replace("#", "");
-    if(h === "records") switchView("records");
-    else switchView("check");
+  /* ================= 配置 / 口令 ================= */
+  var setupForm = document.getElementById("setupForm");
+  var setupErr = document.getElementById("setupErr");
+  var setupBtn = document.getElementById("setupBtn");
+
+  setupForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var url = document.getElementById("cfgUrl").value.trim();
+    var key = document.getElementById("cfgKey").value.trim();
+    var pass = document.getElementById("cfgPass").value;
+    setupErr.textContent = "";
+    if(!/^https?:\/\/.+/.test(url)){ setupErr.textContent = "请填写完整的 https:// 开头地址"; return; }
+    if(key.length < 20){ setupErr.textContent = "key 看起来不完整"; return; }
+    if(pass.length < 4){ setupErr.textContent = "口令至少 4 位"; return; }
+
+    var cfg = { url: url, key: key };
+    setupBtn.disabled = true; setupBtn.textContent = "测试连接…";
+    sbFetch(cfg, "ft_records?select=id&limit=1").then(function(){
+      return deriveKey(pass);
+    }).then(function(k){
+      state.cfg = cfg; state.key = k; state.mode = "cloud";
+      lsSet(CFG_KEY, JSON.stringify(cfg));
+      lsSet(PASS_KEY, btoa(encodeURIComponent(pass)));
+      return cloudList().then(function(r){
+        state.records = r.records;
+        renderHome(); switchView("home");
+        toast("配置完成，已开启云端同步");
+      });
+    }).catch(function(err){
+      if(err.status === 404 || /relation|does not exist/i.test(err.message || "")){
+        setupErr.textContent = "连不上数据表：请先在 Supabase 里运行建表 SQL（ft_records）";
+      }else if(err.status === 401 || err.status === 403){
+        setupErr.textContent = "key 不正确，或未开放匿名访问";
+      }else{
+        setupErr.textContent = "连接失败：" + (err.message || "请检查 URL 与网络");
+      }
+    }).then(function(){
+      setupBtn.disabled = false; setupBtn.textContent = "保存并开始使用";
+    });
+  });
+
+  document.getElementById("setupSkip").addEventListener("click", function(){
+    state.mode = "local";
+    state.records = localRead().map(normalize);
+    renderHome(); switchView("home");
+    toast("已进入本地模式，记录不会同步");
+  });
+
+  var gateForm = document.getElementById("gateForm");
+  var gatePass = document.getElementById("gatePass");
+  var gateErr = document.getElementById("gateErr");
+  var gateBtn = document.getElementById("gateBtn");
+
+  function unlock(pass, remember){
+    gateErr.textContent = "";
+    gateBtn.disabled = true; gateBtn.textContent = "验证中…";
+    return deriveKey(pass).then(function(k){
+      state.key = k;
+      return cloudList().then(function(r){
+        if(r.total > 0 && r.records.length === 0){
+          var err = new Error("口令不正确"); err.code = "AUTH"; throw err;
+        }
+        state.records = r.records;
+        if(remember) lsSet(PASS_KEY, btoa(encodeURIComponent(pass)));
+        return true;
+      });
+    }).then(function(){
+      gateBtn.disabled = false; gateBtn.textContent = "进入";
+      renderHome(); switchView("home");
+    }).catch(function(err){
+      gateBtn.disabled = false; gateBtn.textContent = "进入";
+      state.key = null;
+      gateErr.textContent = err.code === "AUTH" ? "口令不正确" : ("连接失败：" + (err.message || "请检查网络"));
+    });
   }
 
-  function boot(){
+  gateForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var pass = gatePass.value.trim();
+    if(!pass){ gateErr.textContent = "请输入口令"; return; }
+    unlock(pass, document.getElementById("rememberPass").checked);
+  });
+
+  document.getElementById("gateReset").addEventListener("click", function(){
+    if(!confirm("清除本机的 Supabase 配置？下次需要重新填写 URL 和 key（云端记录不会丢失）。")) return;
+    lsDel(CFG_KEY); lsDel(PASS_KEY);
+    state.cfg = null; state.key = null; state.mode = "local";
+    BUILTIN = null;
+    hideAll();
+    document.getElementById("view-setup").hidden = false;
+  });
+
+  /* ================= 启动 ================= */
+  var now = new Date();
+  document.getElementById("todayLabel").textContent =
+    "今天是 " + now.getFullYear() + "年" + (now.getMonth()+1) + "月" + now.getDate() + "日 " + WD[now.getDay()];
+
+  (function boot(){
     var cfg = readCfg();
     if(!cfg){
       hideAll();
@@ -953,19 +1265,14 @@
     state.mode = "cloud";
     if(!hasCrypto()){
       state.mode = "local";
-      state.records = localRead();
-      startUI();
+      state.records = localRead().map(normalize);
+      renderHome(); switchView("home");
       toast("当前环境不支持加密，已切换到本地模式");
       return;
     }
     var saved = lsGet(PASS_KEY);
-    if(!saved){
-      hideAll();
-      document.getElementById("view-gate").hidden = false;
-      return;
-    }
     var pass = "";
-    try { pass = decodeURIComponent(atob(saved)); } catch(e) { pass = ""; }
+    if(saved){ try { pass = decodeURIComponent(atob(saved)); } catch(e) { pass = ""; } }
     if(!pass){
       hideAll();
       document.getElementById("view-gate").hidden = false;
@@ -983,20 +1290,14 @@
         return;
       }
       state.records = r.records;
-      startUI();
+      renderHome(); switchView("home");
     }).catch(function(err){
       state.mode = "local";
-      state.records = localRead();
-      startUI();
+      state.records = localRead().map(normalize);
+      renderHome(); switchView("home");
       toast("云端连接失败，暂用本地模式：" + (err.message || ""));
     });
-  }
-
-  renderQuiz();
-  var now = new Date();
-  document.getElementById("todayLabel").textContent =
-    "今天是 " + now.getFullYear() + "年" + (now.getMonth()+1) + "月" + now.getDate() + "日 " + WD[now.getDay()];
-  boot();
+  })();
 })();
 </script>
 </body>
