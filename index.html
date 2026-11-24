@@ -116,8 +116,7 @@
   .wiz-free{margin-top:20px;padding-top:16px;border-top:1px dashed var(--line);}
   .wiz-free label{display:block;font-size:13px;color:var(--ink-3);margin-bottom:6px;}
   .wiz-free textarea{min-height:76px;}
-  .wiz-nav{display:flex;gap:10px;margin-top:18px;align-items:center;}
-  .wiz-nav .btn{min-height:46px;}
+  .wiz-nav{display:flex;gap:10px;margin-top:18px;align-items:center;}  .wiz-nav .btn{min-height:46px;}
   .cat{border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;background:var(--card);transition:border-color .15s,background .15s;}
   .cat.rec{border-color:var(--accent);background:var(--accent-soft);}
   .cat-head{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:15.5px;-webkit-tap-highlight-color:transparent;}
@@ -184,6 +183,14 @@
   .qa-row:first-child{border-top:0;padding-top:2px;}
   .qa-q{font-size:12.5px;color:var(--ink-3);margin-bottom:2px;line-height:1.5;}
   .qa-a{font-size:15px;font-weight:600;white-space:pre-wrap;word-break:break-word;line-height:1.55;}
+  .pill.plan{background:var(--hover);color:var(--ink-2);border:1px dashed var(--line);}
+  .rec-resume{
+    margin-top:12px;appearance:none;border:1px solid var(--accent);background:var(--accent-soft);
+    color:var(--accent);font-size:14px;font-weight:600;padding:9px 14px;border-radius:10px;
+    cursor:pointer;min-height:40px;width:100%;
+  }
+  .rec-resume:hover{opacity:.9;}
+
   .empty{text-align:center;padding:48px 20px;color:var(--ink-3);font-size:14.5px;border:1px dashed var(--line);border-radius:14px;}
   .empty .emoji{font-size:28px;display:block;margin-bottom:10px;opacity:.7;}
 
@@ -348,6 +355,7 @@
     <button class="btn ghost" type="button" id="wizPrev">上一步</button>
     <button class="btn primary grow" type="button" id="wizNext">下一步</button>
   </div>
+  <button class="linkbtn" type="button" id="wizSavePlan" style="margin-top:10px;" hidden>先存为计划，做完后再回来补第四、五步</button>
   <div style="height:8px;"></div>
 </main>
 
@@ -918,7 +926,7 @@
 
   /* ================= 分步引导：逻辑 ================= */
   var WIZ_DRAFT_KEY = "ft-check:guided-draft";
-  var wiz = { step:1, data:null };
+  var wiz = { step:1, data:null, planId:null };
 
   function blankGuided(){
     return {
@@ -970,6 +978,8 @@
     document.getElementById("wizBody").innerHTML = renderWizStep(n);
     document.getElementById("wizPrev").style.visibility = (n === 1) ? "hidden" : "visible";
     document.getElementById("wizNext").textContent = (n === 5) ? "保存这次记录" : "下一步";
+    var savePlanBtn = document.getElementById("wizSavePlan");
+    if(savePlanBtn) savePlanBtn.hidden = !(n >= 2 && !wiz.planId);
     window.scrollTo({top:0, behavior:"smooth"});
   }
 
@@ -1190,7 +1200,8 @@
     if(wiz.step > 1){ wiz.step--; saveWizDraft(); renderWiz(); }
   }
 
-  function saveGuided(){
+  function saveGuided(status){
+    status = status || "done";
     var d = wiz.data, A = [];
     function add(q, a){ if(a && String(a).trim()) A.push({ q:q, a:String(a).trim() }); }
     add("第一步 · 1. 我现在的精力状态", d.p1.energy === "__other__" ? ("其他：" + (d.p1.energyOther || "")) : d.p1.energy);
@@ -1217,23 +1228,75 @@
 
     if(A.length < 3){ toast("至少把第一步填完再保存吧"); return; }
 
-    var entry = { ts:new Date().toISOString(), type:"guided", typeLabel:"分步引导", title:GUIDED.title, answers:A };
+    var entry = {
+      ts: new Date().toISOString(),
+      type: "guided",
+      typeLabel: "分步引导",
+      status: status,
+      answers: A,
+      payload: JSON.parse(JSON.stringify(d))
+    };
     var btn = document.getElementById("wizNext");
+    var planBtn = document.getElementById("wizSavePlan");
     btn.disabled = true; btn.textContent = "保存中…";
-    saveRecord(entry).then(function(){
+    if(planBtn) planBtn.disabled = true;
+
+    saveRecord(entry).then(function(saved){
+      var oldPlan = wiz.planId;
+      wiz.planId = null;
+      if(oldPlan){
+        return removeRecord(oldPlan).then(function(){ return saved; });
+      }
+      return saved;
+    }).then(function(){
       clearWizDraft();
       wiz.data = blankGuided(); wiz.step = 1;
-      document.getElementById("resultCard").innerHTML =
-        '<div class="qa-row"><span class="pill">分步引导</span><span class="rec-time" style="margin-left:8px;">' + esc(fmtLong(entry.ts)) + '</span></div>' +
-        A.map(function(a){ return '<div class="qa-row"><div class="qa-q">' + esc(a.q) + '</div><div class="qa-a">' + esc(a.a) + '</div></div>'; }).join("") +
-        '<div class="qa-row"><div class="qa-q">累计记录</div><div class="qa-a">共 ' + state.records.length + ' 条</div></div>';
-      switchView("result");
-      toast("已保存，可在记录里看到完整过程");
       renderHome();
+      if(status === "planned"){
+        switchView("home");
+        toast("已存为计划，做完后可到记录里点「继续填写」");
+      }else{
+        document.getElementById("resultCard").innerHTML =
+          '<div class="qa-row"><span class="pill">分步引导</span><span class="rec-time" style="margin-left:8px;">' + esc(fmtLong(entry.ts)) + '</span></div>' +
+          A.map(function(a){ return '<div class="qa-row"><div class="qa-q">' + esc(a.q) + '</div><div class="qa-a">' + esc(a.a) + '</div></div>'; }).join("") +
+          '<div class="qa-row"><div class="qa-q">累计记录</div><div class="qa-a">共 ' + state.records.length + ' 条</div></div>';
+        switchView("result");
+        toast("已保存，可在记录里看到完整过程");
+      }
     }).catch(function(err){
       toast("保存失败：" + (err.message || "请检查网络"));
     }).then(function(){
-      btn.disabled = false; btn.textContent = "保存这次记录";
+      btn.disabled = false; btn.textContent = "下一步";
+      if(planBtn){ planBtn.disabled = false; }
+    });
+  }
+
+  function resumePlan(id){
+    var rec = null;
+    state.records.forEach(function(r){ if(String(r.id) === String(id)) rec = r; });
+    if(!rec){ toast("找不到这条计划"); return; }
+    if(!rec.payload){ toast("这条计划缺少原始内容，无法继续填写"); return; }
+    var base = blankGuided();
+    var p = rec.payload;
+    ["p1","p2","p3","p4","p5"].forEach(function(k){
+      if(p[k]){ base[k] = Object.assign(base[k], p[k]); }
+    });
+    wiz.data = base;
+    wiz.planId = rec.id;
+    wiz.step = 4;
+    renderWiz();
+    switchView("guided");
+    toast("已带入之前的填写，接着补第四、五步");
+  }
+
+  var wizSavePlanBtn = document.getElementById("wizSavePlan");
+  if(wizSavePlanBtn){
+    wizSavePlanBtn.addEventListener("click", function(){
+      collectStep(wiz.step);
+      var d = wiz.data;
+      if(!d.p1.energy || !d.p1.need){ toast("先把第一步的两个状态选完"); return; }
+      if(!d.p2.cat){ toast("先选一个大类型"); return; }
+      saveGuided("planned");
     });
   }
 
@@ -1483,15 +1546,17 @@
       return;
     }
     list.innerHTML = rows.map(function(r){
-      return '<article class="rec" data-id="' + esc(r.id) + '">' +
+      var isPlan = (r.status === "planned");
+      return '<article class="rec' + (isPlan ? ' rec-plan' : '') + '" data-id="' + esc(r.id) + '">' +
         '<div class="rec-head">' +
-          '<span class="pill">' + esc(r.typeLabel || TYPE_LABEL[r.type] || "记录") + '</span>' +
+          '<span class="pill' + (isPlan ? ' plan' : '') + '">' + esc(r.typeLabel || TYPE_LABEL[r.type] || "记录") + (isPlan ? ' · 待完成' : '') + '</span>' +
           '<span class="rec-time">' + esc(fmtLong(r.ts)) + '</span>' +
           '<button class="rec-del" type="button" data-del="' + esc(r.id) + '" aria-label="删除这条记录">删除</button>' +
         '</div>' +
         (r.answers || []).map(function(a){
           return '<div class="qa-row"><div class="qa-q">' + esc(a.q) + '</div><div class="qa-a">' + esc(a.a) + '</div></div>';
         }).join("") +
+        (isPlan ? '<button class="rec-resume" type="button" data-resume="' + esc(r.id) + '">继续填写第四、五步 →</button>' : '') +
       '</article>';
     }).join("");
   }
@@ -1504,6 +1569,8 @@
   });
 
   document.getElementById("recordList").addEventListener("click", function(e){
+    var rb = e.target.closest("[data-resume]");
+    if(rb){ resumePlan(rb.getAttribute("data-resume")); return; }
     var btn = e.target.closest("[data-del]");
     if(!btn) return;
     if(!confirm("删除这条记录？删除后无法恢复。")) return;
