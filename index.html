@@ -99,6 +99,12 @@
     border:1px solid var(--accent);background:var(--bg);color:var(--ink);outline:none;
   }
 
+  .q-free{margin-top:22px;padding:16px 16px 14px;border:1px dashed var(--line);border-radius:14px;background:var(--hover);}
+  .q.q-free{border-top:0;}
+  .q-free .qtitle{font-size:15.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;}
+  .q-free .qno{color:var(--ink-3);}
+  .q-free textarea{background:var(--card);}
+
   .text-fields{display:flex;flex-direction:column;gap:10px;}
   .tf{display:flex;gap:10px;align-items:flex-start;}
   .tf label{flex:0 0 76px;font-size:14px;color:var(--ink-2);padding-top:11px;font-weight:600;}
@@ -391,6 +397,9 @@
         { id:"q5", title:"结束后，我实际获得了什么？", options:[
           "理解了一部分新知识","学会了一种方法","对某个问题产生了新的认识",
           "获得了阅读或学习的乐趣","只是完成了一段阅读，还没有明显收获","消耗了很多精力，但收获有限"
+        ]},
+        { id:"extra", title:"留一段空白：还有什么想记下的？", freeSlot:true, text:[
+          { id:"free", label:"自由记录", multiline:true, placeholder:"想到什么写什么，不想写就跳过。" }
         ]}
       ]
     },
@@ -421,6 +430,9 @@
         { id:"q5", title:"我希望下次怎样调整？", options:[
           "继续保持目前的投入程度","提前确定创作时长","给每次创作设定一个小目标",
           "减少反复刷新反馈","保留完整的休息和生活时间","在意犹未尽时主动结束"
+        ]},
+        { id:"extra", title:"留一段空白：还有什么想记下的？", freeSlot:true, text:[
+          { id:"free", label:"自由记录", multiline:true, placeholder:"想到什么写什么，不想写就跳过。" }
         ]}
       ]
     },
@@ -450,6 +462,9 @@
           "先判断自己是否真的需要休息","换成有明确结束点的娱乐","提前确定观看时间",
           "先决定接下来要做的事情，再开始娱乐","暂时离开手机，活动一下身体",
           "不需要立刻做其他事情，先安静休息"
+        ]},
+        { id:"extra", title:"留一段空白：还有什么想记下的？", freeSlot:true, text:[
+          { id:"free", label:"自由记录", multiline:true, placeholder:"想到什么写什么，不想写就跳过。" }
         ]}
       ]
     },
@@ -477,7 +492,10 @@
         { id:"q5", title:"下次做同样的事情，我希望有什么不同？", options:[
           "保持现在的方式","降低开始的门槛","减少不必要的深入和延伸","提前设定结束条件",
           "及时从活动中抽离","给其他兴趣和生活体验留出时间"
-        ], other:true }
+        ], other:true },
+        { id:"extra", title:"留一段空白：还有什么想记下的？", freeSlot:true, text:[
+          { id:"free", label:"自由记录", multiline:true, placeholder:"想到什么写什么，不想写就跳过。" }
+        ]}
       ]
     },
     {
@@ -752,16 +770,20 @@
     state.records.forEach(function(r){ m[r.type] = (m[r.type]||0)+1; });
     return m;
   }
+  function qCount(s){
+    return s.questions.filter(function(q){ return !q.freeSlot; }).length;
+  }
   function renderHome(){
     var m = counts();
     var html = SURVEYS.map(function(s){
       var n = m[s.id] || 0;
+      var sizeText = s.journal ? (s.sections.length + ' 个部分') : (qCount(s) + ' 个问题 + 留白');
       return '<button class="home-card" type="button" data-survey="' + s.id + '">' +
         '<span class="ico">' + s.icon + '</span>' +
         '<span class="body">' +
           '<h3>' + esc(s.title) + '</h3>' +
           '<p>' + esc(s.desc) + '</p>' +
-          '<span class="meta">' + (s.journal ? (s.sections.length + ' 个部分') : (s.questions.length + ' 个问题')) +
+          '<span class="meta">' + sizeText +
             (n ? ' · 已记录 ' + n + ' 次' : '') + '</span>' +
         '</span>' +
         '<span class="arrow">›</span>' +
@@ -786,7 +808,7 @@
     state.current = survey;
     document.getElementById("surveyTitle").textContent = survey.title;
     document.getElementById("surveyDesc").textContent = survey.desc;
-    document.getElementById("surveyTag").textContent = survey.journal ? "自由书写" : (survey.questions.length + " 个问题");
+    document.getElementById("surveyTag").textContent = survey.journal ? "自由书写" : (qCount(survey) + " 个问题 + 1 个留白");
     surveyForm.innerHTML = survey.journal ? renderJournal(survey) : renderQuestions(survey);
     bindFormEvents();
     switchView("survey");
@@ -810,14 +832,15 @@
       }
       if(q.text){
         var fields = q.text.map(function(f){
+          var lab = q.freeSlot ? "" : '<label>' + esc(f.label) + '</label>';
           if(f.multiline){
-            return '<div class="tf"><label>' + esc(f.label) + '</label>' +
-              '<textarea data-text="' + q.id + '-' + f.id + '" placeholder="写下来…"></textarea></div>';
+            return '<div class="tf">' + lab +
+              '<textarea class="tall" data-text="' + q.id + '-' + f.id + '" placeholder="' + esc(f.placeholder || '写下来…') + '"></textarea></div>';
           }
-          return '<div class="tf"><label>' + esc(f.label) + '</label>' +
-            '<input type="text" data-text="' + q.id + '-' + f.id + '" placeholder="写下来…" /></div>';
+          return '<div class="tf">' + lab +
+            '<input type="text" data-text="' + q.id + '-' + f.id + '" placeholder="' + esc(f.placeholder || '写下来…') + '" /></div>';
         }).join("");
-        return '<div class="q" data-qid="' + q.id + '">' + head + '<div class="text-fields">' + fields + '</div></div>';
+        return '<div class="q' + (q.freeSlot ? ' q-free' : '') + '" data-qid="' + q.id + '">' + head + '<div class="text-fields">' + fields + '</div></div>';
       }
       return "";
     }).join("");
